@@ -66,12 +66,15 @@ bookForm.addEventListener("submit", function(e){
 
   e.preventDefault();
 
-  const newBook = {
-    title: document.getElementById("title").value,
-    author: document.getElementById("author").value,
-    category: document.getElementById("category").value,
-    status: document.getElementById("status").value
-  };
+const newBook = {
+  title: document.getElementById("title").value,
+  volume: document.getElementById("volume").value,
+  author: document.getElementById("author").value,
+  category: document.getElementById("category").value,
+  borrower: document.getElementById("borrower").value || "-",
+  borrowDate: document.getElementById("borrowDate").value || "-",
+  status: document.getElementById("status").value
+};
 
   books.push(newBook);
 
