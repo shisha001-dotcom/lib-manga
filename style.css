@@ -308,3 +308,12 @@ tbody tr {
   }
 
 }
+
+.volume-badge{
+  background: #2563eb;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
