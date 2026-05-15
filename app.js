@@ -36,22 +36,34 @@ function renderBooks() {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-      <td>${book.title}</td>
-      <td>${book.author}</td>
-      <td>${book.category}</td>
+  <td>${book.title}</td>
 
-      <td>
-        <span class="status ${book.status.toLowerCase()}">
-          ${book.status}
-        </span>
-      </td>
+  <td>
+    <span class="volume-badge">
+      Vol ${book.volume}
+    </span>
+  </td>
 
-      <td>
-        <button class="delete-btn" onclick="deleteBook(${index})">
-          Delete
-        </button>
-      </td>
-    `;
+  <td>${book.author}</td>
+
+  <td>${book.category}</td>
+
+  <td>${book.borrower}</td>
+
+  <td>${book.borrowDate}</td>
+
+  <td>
+    <span class="status ${book.status.toLowerCase()}">
+      ${book.status}
+    </span>
+  </td>
+
+  <td>
+    <button class="delete-btn" onclick="deleteBook(${index})">
+      Delete
+    </button>
+  </td>
+`;
 
     bookTableBody.appendChild(row);
 
