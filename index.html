@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Management Dashboard</title>
+
+  <link rel="stylesheet" href="style.css"/>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fa-solid fa-book"></i>
+        <h2>Library</h2>
+      </div>
+
+      <ul class="menu">
+        <li class="active">
+          <i class="fa-solid fa-chart-line"></i>
+          Dashboard
+        </li>
+
+        <li>
+          <i class="fa-solid fa-book-open"></i>
+          Books
+        </li>
+
+        <li>
+          <i class="fa-solid fa-users"></i>
+          Members
+        </li>
+
+        <li>
+          <i class="fa-solid fa-gear"></i>
+          Settings
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search books..."
+          />
+        </div>
+
+        <div class="top-actions">
+
+          <select id="categoryFilter">
+            <option value="all">All Categories</option>
+            <option value="Programming">Programming</option>
+            <option value="Science">Science</option>
+            <option value="Business">Business</option>
+            <option value="History">History</option>
+            <option value="Novel">Novel</option>
+          </select>
+
+          <button id="darkModeToggle">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- Stats -->
+      <section class="stats">
+
+        <div class="card">
+          <div class="card-icon blue">
+            <i class="fa-solid fa-book"></i>
+          </div>
+
+          <div>
+            <h3 id="totalBooks">0</h3>
+            <p>Total Books</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon green">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+
+          <div>
+            <h3 id="availableBooks">0</h3>
+            <p>Available</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon red">
+            <i class="fa-solid fa-bookmark"></i>
+          </div>
+
+          <div>
+            <h3 id="borrowedBooks">0</h3>
+            <p>Borrowed</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Form -->
+      <section class="form-section">
+
+        <h2>Add New Book</h2>
+
+        <form id="bookForm">
+
+          <div class="form-grid">
+
+            <input
+              type="text"
+              id="title"
+              placeholder="Book Title"
+              required
+            />
+
+            <input
+              type="text"
+              id="author"
+              placeholder="Author"
+              required
+            />
+
+            <select id="category" required>
+              <option value="">Select Category</option>
+              <option value="Programming">Programming</option>
+              <option value="Science">Science</option>
+              <option value="Business">Business</option>
+              <option value="History">History</option>
+              <option value="Novel">Novel</option>
+            </select>
+
+            <select id="status" required>
+              <option value="Available">Available</option>
+              <option value="Borrowed">Borrowed</option>
+            </select>
+
+          </div>
+
+          <button type="submit" class="add-btn">
+            <i class="fa-solid fa-plus"></i>
+            Add Book
+          </button>
+
+        </form>
+
+      </section>
+
+      <!-- Table -->
+      <section class="table-section">
+
+        <div class="table-header">
+          <h2>Library Books</h2>
+        </div>
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody id="bookTableBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
