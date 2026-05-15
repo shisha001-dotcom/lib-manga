@@ -125,37 +125,55 @@
 
         <form id="bookForm">
 
-          <div class="form-grid">
+         <div class="form-grid">
 
-            <input
-              type="text"
-              id="title"
-              placeholder="Book Title"
-              required
-            />
+  <input
+    type="text"
+    id="title"
+    placeholder="Book Title"
+    required
+  />
 
-            <input
-              type="text"
-              id="author"
-              placeholder="Author"
-              required
-            />
+  <input
+    type="number"
+    id="volume"
+    placeholder="Volume"
+    required
+  />
 
-            <select id="category" required>
-              <option value="">Select Category</option>
-              <option value="Programming">Programming</option>
-              <option value="Science">Science</option>
-              <option value="Business">Business</option>
-              <option value="History">History</option>
-              <option value="Novel">Novel</option>
-            </select>
+  <input
+    type="text"
+    id="author"
+    placeholder="Author"
+    required
+  />
 
-            <select id="status" required>
-              <option value="Available">Available</option>
-              <option value="Borrowed">Borrowed</option>
-            </select>
+  <select id="category" required>
+    <option value="">Select Category</option>
+    <option value="Programming">Programming</option>
+    <option value="Science">Science</option>
+    <option value="Business">Business</option>
+    <option value="History">History</option>
+    <option value="Novel">Novel</option>
+  </select>
 
-          </div>
+  <input
+    type="text"
+    id="borrower"
+    placeholder="Borrower Name"
+  />
+
+  <input
+    type="date"
+    id="borrowDate"
+  />
+
+  <select id="status" required>
+    <option value="Available">Available</option>
+    <option value="Borrowed">Borrowed</option>
+  </select>
+
+</div>
 
           <button type="submit" class="add-btn">
             <i class="fa-solid fa-plus"></i>
@@ -178,14 +196,17 @@
           <table>
 
             <thead>
-              <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Category</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+  <tr>
+    <th>Title</th>
+    <th>Volume</th>
+    <th>Author</th>
+    <th>Category</th>
+    <th>Borrower</th>
+    <th>Borrow Date</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+</thead>
 
             <tbody id="bookTableBody"></tbody>
 
