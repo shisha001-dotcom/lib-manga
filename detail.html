@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+          available: true,
+          cover: "https://i.imgur.com/9Xnt6w1.jpg"
+        },
+        {
+          number: 3,
+          available: false,
+          cover: "https://i.imgur.com/9Xnt6w1.jpg"
+        },
+        {
+          number: 4,
+          available: true,
+          cover: "https://i.imgur.com/B6XG4kP.jpg"
+        },
+        {
+          number: 5,
+          available: false,
+          cover: "https://i.imgur.com/B6XG4kP.jpg"
+        }
+      ]
+    };
+
+    function renderDetail() {
+
+      const container = document.getElementById("detail-container");
+
+      let html = `
+        <div class="manga-header">
+          <img class="manga-cover" src="${mangaData.cover}">
+
+          <div>
+            <h1>${mangaData.title}</h1>
+            <p>${mangaData.description}</p>
+            <h5>Tổng số tập: ${mangaData.episodes.length}</h5>
+          </div>
+        </div>
+
+        <div class="episode-grid">
+      `;
+
+      mangaData.episodes.forEach(ep => {
+
+        html += `
+          <div
+            class="episode-card ${ep.available ? '' : 'missing'}"
+            onclick="showLargeImage('${ep.cover}')"
+          >
+
+            <img src="${ep.cover}">
+
+            <div class="episode-info">
+              <h5>Tập ${ep.number}</h5>
+              <p>
+                ${ep.available ? 'Có sẵn' : 'Chưa có'}
+              </p>
+            </div>
+
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+
+      container.innerHTML = html;
+    }
+
+    function showLargeImage(src) {
+      document.getElementById("modalImage").src = src;
+      $('#imageModal').modal('show');
+    }
+
+    renderDetail();
+
+  </script>
+
+</body>
+</html>
