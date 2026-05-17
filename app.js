@@ -1,5 +1,5 @@
 /* ============================================================
-   MANGA COLLECTION — app.js
+   MANGA COLLECTION — app.js (FIXED & ENHANCED)
    ============================================================
 
    ╔══════════════════════════════════════════════════════════╗
@@ -58,7 +58,6 @@
 'use strict';
 
 /* ─── Constants ─── */
-// ĐỔI v2 → v3, v4... mỗi khi muốn reset dữ liệu về mặc định
 const STORAGE_KEY = 'manga_collection_v2';
 const DEFAULT_COVER = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="560" viewBox="0 0 400 560"%3E%3Crect fill="%230d1117" width="400" height="560"/%3E%3Ctext x="200" y="290" text-anchor="middle" font-size="72" fill="%23333"%3E📚%3C/text%3E%3C/svg%3E';
 
@@ -67,10 +66,10 @@ let state = {
   books: [],
   editId: null,
   confirmDeleteId: null,
-  viewMode: 'grid',    // 'grid' | 'list'
+  viewMode: 'grid',
   sortBy: 'newest',
   search: '',
-  activeTag: null,     // tag đang được lọc
+  activeTag: null,
 };
 
 /* ─── Storage helpers ─── */
@@ -105,7 +104,6 @@ function saveBooks() {
    ──────────────────────────────────────────────────────────── */
 function getDefaultBooks() {
   return [
-    // ── SÁCH MẪU — xóa hoặc thay thế bằng bộ sưu tập của bạn ──
     {
       id: 1,
       name: 'One Piece',
@@ -119,7 +117,6 @@ function getDefaultBooks() {
       synopsis: 'Monkey D. Luffy, một chàng trai trẻ với ước mơ trở thành Vua Hải Tặc, tập hợp thuyền viên và bắt đầu hành trình vĩ đại trên biển Grand Line để tìm kiếm kho báu One Piece.',
       createdAt: Date.now() - 1000000,
     },
-    // ── THÊM SÁCH MỚI Ở ĐÂY ── (copy object bên trên, đổi id thành 2, 3...)
   ];
 }
 
@@ -128,7 +125,6 @@ function parseVolumes(str) {
   if (!str || !str.trim()) return [];
   const errors = [];
 
-  // Hỗ trợ dải: "1-10,12" → [1,2,3,...,10,12]
   const parts = str.split(',').map(v => v.trim()).filter(Boolean);
   const nums = [];
   parts.forEach(part => {
@@ -157,27 +153,46 @@ function parseVolumes(str) {
 function parseCoverMap(text) {
   const map = {};
   if (!text || !text.trim()) return map;
+  
   text.split('\n').forEach((line, i) => {
-    const parts = line.split('|');
+    const trimmedLine = line.trim();
+    if (!trimmedLine) return; // Bỏ qua dòng trống
+    
+    const parts = trimmedLine.split('|');
     if (parts.length < 2) {
-      if (line.trim()) console.warn(`[MangaCol] Line ${i + 1} ignored: "${line}"`);
+      console.warn(`[MangaCol] Line ${i + 1} ignored (format sai): "${line}"`);
       return;
     }
+    
     const volStr = parts[0].replace(/tập/i, '').trim();
     const vol    = parseInt(volStr, 10);
     const url    = parts[1].trim();
-    if (isNaN(vol)) { console.warn(`Cannot parse volume: "${parts[0]}"`); return; }
+    
+    if (isNaN(vol) || vol <= 0) {
+      console.warn(`[MangaCol] Volume không hợp lệ: "${parts[0]}"`);
+      return;
+    }
+    
+    if (!url || !url.startsWith('http')) {
+      console.warn(`[MangaCol] URL không hợp lệ ở tập ${vol}: "${url}"`);
+      return;
+    }
+    
     map[vol] = url;
   });
+  
   return map;
 }
 
 function parseTags(str) {
   if (!str || !str.trim()) return [];
-  return str.split(',').map(t => t.trim()).filter(Boolean);
+  return str.split(',')
+    .map(t => t.trim())
+    .filter(Boolean)
+    .filter(t => t.length > 0);
 }
 
-/* ─── Validation (chỉ dùng cho form sửa) ─── */
+/* ─── Validation ─── */
 function validateEditForm() {
   let valid = true;
 
@@ -186,7 +201,6 @@ function validateEditForm() {
     setFieldError('bookName', 'Vui lòng nhập tên truyện');
     valid = false;
   } else {
-    // Kiểm tra trùng tên (ngoại trừ chính nó)
     const dup = state.books.find(b => b.name.toLowerCase() === nameVal.toLowerCase() && b.id !== state.editId);
     if (dup) {
       setFieldError('bookName', `"${dup.name}" đã tồn tại trong kho`);
@@ -211,7 +225,10 @@ function setFieldError(id, msg) {
   const input = q(`#${id}`);
   const err   = q(`#${id}Error`);
   if (input) input.classList.add('error');
-  if (err) { err.textContent = msg; err.classList.add('visible'); }
+  if (err) { 
+    err.textContent = msg; 
+    err.classList.add('visible'); 
+  }
 }
 
 function clearFieldError(id) {
@@ -223,7 +240,6 @@ function clearFieldError(id) {
 
 /* ─── Edit (Sửa) ─── */
 function startEdit(id) {
-  // Đóng detail modal nếu đang mở
   closeDetailModal();
 
   const book = state.books.find(b => b.id === id);
@@ -240,7 +256,6 @@ function startEdit(id) {
     .map(([vol, url]) => `Tập ${vol}|${url}`)
     .join('\n');
 
-  // Textarea synopsis
   if (q('#bookSynopsis')) {
     q('#bookSynopsis').value = book.synopsis || '';
   }
@@ -282,7 +297,7 @@ function saveEdit() {
   saveBooks();
   closeEditModal();
   render();
-  renderTagFilter(); // cập nhật tag chips
+  renderTagFilter();
 }
 
 function closeEditModal() {
@@ -308,7 +323,7 @@ function executeDelete() {
   render();
   renderTagFilter();
   closeDeleteModal();
-  closeDetailModal(); // đóng cả detail nếu đang xem
+  closeDetailModal();
   showToast(`🗑️ Đã xóa "${book?.name}"`, 'info');
   state.confirmDeleteId = null;
 }
@@ -334,27 +349,28 @@ function openDetail(id) {
   for (let i = 1; i <= displayMax; i++) {
     const have   = book.volumes.includes(i);
     const imgUrl = book.volumeCovers?.[i];
+    
+    // FIX: Thêm class "vol-chip-clickable" nếu có ảnh
     chips += `
-      <div class="vol-chip-detail ${have ? 'have' : 'missing-chip'}"
-           title="Tập ${i}${have ? ' ✓ Đang có' : ' ✗ Còn thiếu'}"
+      <div class="vol-chip-detail ${have ? 'have' : 'missing-chip'} ${imgUrl && have ? 'vol-chip-clickable' : ''}"
+           title="Tập ${i}${have ? ' ✓ Đang có' : ' ✗ Còn thiếu'}${imgUrl && have ? ' (Click xem ảnh)' : ''}"
            onclick="handleVolChipClick(${i}, ${book.id})">
         ${imgUrl && have
-          ? `<img src="${escapeHtml(imgUrl)}" alt="Tập ${i}" loading="lazy" onerror="this.remove()">`
+          ? `<img src="${escapeHtml(imgUrl)}" alt="Tập ${i}" loading="lazy" onerror="this.remove()" class="vol-thumbnail">`
           : ''}
         <span class="vol-num">${i}</span>
         ${have ? '' : '<span class="chip-missing-dot">✕</span>'}
+        ${imgUrl && have ? '<span class="vol-has-cover-badge">🖼️</span>' : ''}
       </div>`;
   }
   if ((max || book.volumes.length) > 120) {
     chips += `<div class="vol-chip-detail" style="background:var(--surface3);color:var(--muted)">+${(max || book.volumes.length) - 120} tập</div>`;
   }
 
-  // Tags HTML
   const tagHTML = (book.tags || []).map(t =>
     `<span class="tag tag-detail" onclick="filterByTag('${escapeHtml(t)}')">${escapeHtml(t)}</span>`
   ).join('');
 
-  // Danh sách tập thiếu (text)
   const missingText = missing.length
     ? `<div class="detail-missing-list">Tập còn thiếu: <strong>${missing.slice(0, 30).join(', ')}${missing.length > 30 ? ` … (+${missing.length - 30} tập)` : ''}</strong></div>`
     : '';
@@ -409,19 +425,65 @@ function closeDetailModal() {
   q('#detailModal').classList.remove('open');
 }
 
-/* Click vào chip tập trong detail → không làm gì, chỉ tooltip */
+/* ─── NEW: Hiển thị ảnh bìa tập chi tiết ─── */
 function handleVolChipClick(volNum, bookId) {
   const book = state.books.find(b => b.id === bookId);
   if (!book) return;
+  
   const have = book.volumes.includes(volNum);
-  showToast(have ? `✅ Tập ${volNum} — Đang có` : `⚠️ Tập ${volNum} — Còn thiếu`, have ? 'success' : 'info', 1800);
+  const imgUrl = book.volumeCovers?.[volNum];
+  
+  // Nếu có ảnh và tập này đang có → hiển thị modal ảnh
+  if (imgUrl && have) {
+    openVolumeImage(volNum, bookId);
+  } else {
+    // Nếu không có ảnh → chỉ hiển thị toast
+    showToast(have ? `✅ Tập ${volNum} — Đang có` : `⚠️ Tập ${volNum} — Còn thiếu`, have ? 'success' : 'info', 1800);
+  }
 }
 
-/* ─── Tag Filter (click tag để lọc) ─── */
+/* ─── NEW: Modal hiển thị ảnh bìa tập ─── */
+function openVolumeImage(volNum, bookId) {
+  const book = state.books.find(b => b.id === bookId);
+  if (!book) return;
+  
+  const imgUrl = book.volumeCovers?.[volNum];
+  if (!imgUrl) {
+    showToast(`Không có ảnh bìa cho tập ${volNum}`, 'info');
+    return;
+  }
+  
+  const modal = q('#volumeImageModal');
+  if (!modal) {
+    console.error('[MangaCol] volumeImageModal not found in HTML');
+    return;
+  }
+  
+  const img = q('#volumeImagePreview');
+  const title = q('#volumeImageTitle');
+  
+  if (title) title.textContent = `${book.name} — Tập ${volNum}`;
+  
+  if (img) {
+    img.src = escapeHtml(imgUrl);
+    img.alt = `${book.name} - Tập ${volNum}`;
+    img.onerror = () => {
+      img.src = DEFAULT_COVER;
+      showToast(`Không thể tải ảnh bìa tập ${volNum}. Kiểm tra lại URL.`, 'error');
+    };
+  }
+  
+  modal.classList.add('open');
+}
+
+function closeVolumeImageModal() {
+  const modal = q('#volumeImageModal');
+  if (modal) modal.classList.remove('open');
+}
+
+/* ─── Tag Filter ─── */
 function filterByTag(tag) {
-  // Toggle: nếu đã chọn tag này thì bỏ
   state.activeTag = state.activeTag === tag ? null : tag;
-  // Cũng cập nhật search input để hiển thị
   renderTagFilter();
   render();
   closeDetailModal();
@@ -431,10 +493,12 @@ function renderTagFilter() {
   const wrap = q('#tagFilterWrap');
   if (!wrap) return;
 
-  // Thu thập tất cả unique tags
   const allTags = [...new Set(state.books.flatMap(b => b.tags || []))].sort();
 
-  if (!allTags.length) { wrap.innerHTML = ''; return; }
+  if (!allTags.length) { 
+    wrap.innerHTML = ''; 
+    return; 
+  }
 
   wrap.innerHTML = allTags.map(tag => `
     <button class="tag-filter-chip ${state.activeTag === tag ? 'active' : ''}"
@@ -448,7 +512,6 @@ function renderTagFilter() {
 function getFiltered() {
   let list = [...state.books];
 
-  // Lọc theo search text
   if (state.search) {
     const sq = state.search.toLowerCase();
     list = list.filter(b =>
@@ -458,7 +521,6 @@ function getFiltered() {
     );
   }
 
-  // Lọc theo active tag chip
   if (state.activeTag) {
     list = list.filter(b =>
       (b.tags || []).some(t => t === state.activeTag)
@@ -527,7 +589,6 @@ function renderGrid() {
 
   grid.innerHTML = filtered.map(book => buildBookCard(book)).join('');
 
-  // Xử lý ảnh lỗi
   grid.querySelectorAll('.main-cover').forEach(img => {
     img.addEventListener('error', function () {
       this.src = DEFAULT_COVER;
@@ -543,7 +604,6 @@ function buildBookCard(book) {
   const isComplete = missing.length === 0;
   const cover      = book.cover || DEFAULT_COVER;
 
-  // Gọn tags — hiển thị tối đa 3, còn lại "+N"
   const tags     = book.tags || [];
   const maxTags  = 3;
   const tagHTML  = tags.slice(0, maxTags).map(t =>
@@ -556,16 +616,15 @@ function buildBookCard(book) {
   return `
   <div class="book-card"
      data-id="${book.id}"
-     onclick="window.location.href='detail.html?id=${book.id}'"
+     onclick="openDetail(${book.id})"
      role="listitem"
      tabindex="0"
-     onkeydown="if(event.key==='Enter')window.location.href='detail.html?id=${book.id}'">
+     onkeydown="if(event.key==='Enter')openDetail(${book.id})">
       <div class="card-cover-wrap">
         <img src="${escapeHtml(cover)}" class="main-cover" alt="${escapeHtml(book.name)}" loading="lazy">
         <div class="card-cover-overlay">
           <span class="overlay-hint">👁 Xem chi tiết</span>
         </div>
-        <!-- Nút action ngăn propagation để không mở detail -->
         <div class="card-quick-actions" onclick="event.stopPropagation()">
           <button class="icon-btn edit-btn" onclick="startEdit(${book.id})" title="Chỉnh sửa">✏️</button>
           <button class="icon-btn delete-btn" onclick="confirmDelete(${book.id})" title="Xóa">🗑️</button>
@@ -575,7 +634,6 @@ function buildBookCard(book) {
       <div class="book-content">
         <div class="book-name">${escapeHtml(book.name)}</div>
 
-        <!-- Tags — hiển thị ngay trên card -->
         ${tagHTML ? `<div class="card-tag-list">${tagHTML}</div>` : ''}
 
         <div class="status-badge ${isComplete ? 'complete' : 'missing'}">
@@ -605,7 +663,7 @@ function buildBookCard(book) {
     </div>`;
 }
 
-/* ─── Form helpers (cho edit modal) ─── */
+/* ─── Form helpers ─── */
 function updateCoverPreview(url) {
   const prev = q('#coverPreview');
   if (!prev) return;
@@ -657,19 +715,16 @@ function escapeHtml(str) {
 document.addEventListener('DOMContentLoaded', () => {
   state.books = loadBooks();
 
-  // Search
   q('#searchInput').addEventListener('input', e => {
     state.search = e.target.value.trim();
     render();
   });
 
-  // Sort
   q('#sortSelect').addEventListener('change', e => {
     state.sortBy = e.target.value;
     render();
   });
 
-  // View toggle
   q('#viewGrid').addEventListener('click', () => {
     state.viewMode = 'grid';
     q('#viewGrid').classList.add('active');
@@ -684,16 +739,13 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
   });
 
-  // Edit modal: cover preview on input
   q('#bookCover').addEventListener('input', e => {
     updateCoverPreview(e.target.value.trim());
   });
 
-  // Edit modal: clear errors on input
   q('#bookName').addEventListener('input', () => clearFieldError('bookName'));
   q('#bookVolumes').addEventListener('input', () => clearFieldError('bookVolumes'));
 
-  // Đóng modal khi click backdrop
   q('#deleteModal').addEventListener('click', e => {
     if (e.target === q('#deleteModal')) closeDeleteModal();
   });
@@ -703,13 +755,21 @@ document.addEventListener('DOMContentLoaded', () => {
   q('#detailModal').addEventListener('click', e => {
     if (e.target === q('#detailModal')) closeDetailModal();
   });
+  
+  // NEW: Volume image modal backdrop click
+  const volImgModal = q('#volumeImageModal');
+  if (volImgModal) {
+    volImgModal.addEventListener('click', e => {
+      if (e.target === volImgModal) closeVolumeImageModal();
+    });
+  }
 
-  // Escape key
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       closeDeleteModal();
       closeEditModal();
       closeDetailModal();
+      closeVolumeImageModal();
     }
   });
 
