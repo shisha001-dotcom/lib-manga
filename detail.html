@@ -1,76 +1,67 @@
 <!DOCTYPE html>
-          available: true,
-          cover: "https://i.imgur.com/9Xnt6w1.jpg"
-        },
-        {
-          number: 3,
-          available: false,
-          cover: "https://i.imgur.com/9Xnt6w1.jpg"
-        },
-        {
-          number: 4,
-          available: true,
-          cover: "https://i.imgur.com/B6XG4kP.jpg"
-        },
-        {
-          number: 5,
-          available: false,
-          cover: "https://i.imgur.com/B6XG4kP.jpg"
-        }
-      ]
-    };
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết truyện</title>
 
-    function renderDetail() {
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-      const container = document.getElementById("detail-container");
+  <div id="detail-container"></div>
 
-      let html = `
-        <div class="manga-header">
-          <img class="manga-cover" src="${mangaData.cover}">
+  <script>
+    const STORAGE_KEY = 'manga_collection_v2';
 
-          <div>
-            <h1>${mangaData.title}</h1>
-            <p>${mangaData.description}</p>
-            <h5>Tổng số tập: ${mangaData.episodes.length}</h5>
-          </div>
-        </div>
-
-        <div class="episode-grid">
-      `;
-
-      mangaData.episodes.forEach(ep => {
-
-        html += `
-          <div
-            class="episode-card ${ep.available ? '' : 'missing'}"
-            onclick="showLargeImage('${ep.cover}')"
-          >
-
-            <img src="${ep.cover}">
-
-            <div class="episode-info">
-              <h5>Tập ${ep.number}</h5>
-              <p>
-                ${ep.available ? 'Có sẵn' : 'Chưa có'}
-              </p>
-            </div>
-
-          </div>
-        `;
-      });
-
-      html += `</div>`;
-
-      container.innerHTML = html;
+    function getBooks() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     }
 
-    function showLargeImage(src) {
-      document.getElementById("modalImage").src = src;
-      $('#imageModal').modal('show');
+    function getBookId() {
+      const params = new URLSearchParams(window.location.search);
+      return Number(params.get('id'));
+    }
+
+    function renderDetail() {
+      const books = getBooks();
+      const id = getBookId();
+
+      const book = books.find(b => b.id === id);
+
+      const container = document.getElementById('detail-container');
+
+      if (!book) {
+        container.innerHTML = '<h2>Không tìm thấy truyện</h2>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="detail-page">
+          <img src="${book.cover}" style="max-width:300px">
+
+          <h1>${book.name}</h1>
+
+          <p>${book.synopsis || ''}</p>
+
+          <h3>Số tập hiện có:</h3>
+
+          <div>
+            ${book.volumes.map(v =>
+              `<span class="vol-chip-detail have">${v}</span>`
+            ).join('')}
+          </div>
+
+          <br>
+
+          <button onclick="history.back()">
+            ← Quay lại
+          </button>
+        </div>
+      `;
     }
 
     renderDetail();
-
   </script>
 
 </body>
