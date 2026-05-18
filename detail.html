@@ -44,13 +44,24 @@
 
           <p>${book.synopsis || ''}</p>
 
-          <h3>Số tập hiện có:</h3>
+          <h3>Danh sách tập</h3>
 
-          <div>
-            ${book.volumes.map(v =>
-              `<span class="vol-chip-detail have">${v}</span>`
-            ).join('')}
-          </div>
+<div class="volume-grid">
+  ${book.volumes.map(v => `
+    <div class="volume-card ${v.owned ? 'owned' : 'missing'}">
+
+      <img
+        src="${v.cover || 'https://placehold.co/300x420?text=No+Cover'}"
+        alt="Tập ${v.number}"
+      >
+
+      <div class="volume-info">
+        Tập ${v.number}
+      </div>
+
+    </div>
+  `).join('')}
+</div>
 
           <br>
 
