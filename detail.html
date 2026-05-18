@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Chi tiết truyện</title>
 
   <link rel="stylesheet" href="style.css">
@@ -15,7 +16,9 @@
     const STORAGE_KEY = 'manga_collection_v2';
 
     function getBooks() {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || '[]'
+      );
     }
 
     function getBookId() {
@@ -24,50 +27,110 @@
     }
 
     function renderDetail() {
+
       const books = getBooks();
+
       const id = getBookId();
 
       const book = books.find(b => b.id === id);
 
-      const container = document.getElementById('detail-container');
+      const container =
+        document.getElementById('detail-container');
 
       if (!book) {
-        container.innerHTML = '<h2>Không tìm thấy truyện</h2>';
+
+        container.innerHTML = `
+          <div class="detail-page">
+            <h1>Không tìm thấy truyện</h1>
+          </div>
+        `;
+
         return;
       }
 
       container.innerHTML = `
         <div class="detail-page">
-          <img src="${book.cover}" style="max-width:300px">
 
-          <h1>${book.name}</h1>
+          <div class="top-info">
 
-          <p>${book.synopsis || ''}</p>
+            <img
+              class="main-cover"
+              src="${book.cover}"
+              alt="${book.name}"
+            >
 
-          <h3>Danh sách tập</h3>
+            <div class="book-info">
 
-<div class="volume-grid">
-  ${book.volumes.map(v => `
-    <div class="volume-card ${v.owned ? 'owned' : 'missing'}">
+              <h1 class="book-title">
+                ${book.name}
+              </h1>
 
-      <img
-        src="${v.cover || 'https://placehold.co/300x420?text=No+Cover'}"
-        alt="Tập ${v.number}"
-      >
+              <p class="book-desc">
+                ${book.synopsis || 'Chưa có mô tả'}
+              </p>
 
-      <div class="volume-info">
-        Tập ${v.number}
-      </div>
+              <button
+                class="back-btn"
+                onclick="history.back()"
+              >
+                ← Quay lại
+              </button>
 
-    </div>
-  `).join('')}
-</div>
+            </div>
 
-          <br>
+          </div>
 
-          <button onclick="history.back()">
-            ← Quay lại
-          </button>
+          <h2 class="section-title">
+            Danh sách tập
+          </h2>
+
+          <div class="volume-grid">
+
+            ${(book.volumes || []).map(v => {
+
+              // hỗ trợ dữ liệu cũ dạng [1,2,3]
+              const volume =
+                typeof v === 'number'
+                  ? {
+                      number: v,
+                      owned: true,
+                      cover: ''
+                    }
+                  : v;
+
+              return `
+                <div class="volume-card ${volume.owned ? 'owned' : 'missing'}">
+
+                  <div class="badge ${volume.owned ? 'owned-badge' : 'missing-badge'}">
+                    ${volume.owned ? 'Đã có' : 'Chưa có'}
+                  </div>
+
+                  <img
+                    src="${volume.cover || 'https://placehold.co/300x420?text=No+Cover'}"
+                    alt="Tập ${volume.number}"
+                    loading="lazy"
+                  >
+
+                  <div class="volume-info">
+                    Tập ${volume.number}
+                  </div>
+
+                </div>
+              `;
+            }).join('')}
+
+          </div>
+
+          ${
+            !book.volumes || book.volumes.length === 0
+            ? `
+              <div class="empty-state">
+                Chưa có dữ liệu tập truyện
+              </div>
+            `
+            : ''
+          }
+
         </div>
       `;
     }
