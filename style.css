@@ -697,3 +697,58 @@ body::before {
   .book-grid { grid-template-columns: 1fr; }
   .logo-text { font-size: 22px; }
 }
+
+.detail-page{
+  max-width:1200px;
+  margin:auto;
+  padding:24px;
+}
+
+.detail-page > img{
+  width:240px;
+  border-radius:16px;
+  margin-bottom:24px;
+}
+
+.volume-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:18px;
+  margin-top:20px;
+}
+
+.volume-card{
+  background:#1b1b1b;
+  border-radius:16px;
+  overflow:hidden;
+  transition:.25s;
+  position:relative;
+}
+
+.volume-card:hover{
+  transform:translateY(-5px);
+}
+
+.volume-card img{
+  width:100%;
+  aspect-ratio:2/3;
+  object-fit:cover;
+  display:block;
+}
+
+.volume-info{
+  padding:12px;
+  text-align:center;
+  font-weight:600;
+}
+
+.volume-card.missing{
+  opacity:.45;
+}
+
+.volume-card.missing img{
+  filter:
+    grayscale(100%)
+    blur(1px)
+    brightness(.7);
+}
