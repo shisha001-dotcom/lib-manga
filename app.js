@@ -616,10 +616,10 @@ function buildBookCard(book) {
   return `
   <div class="book-card"
      data-id="${book.id}"
-     onclick="openDetail(${book.id})"
+     onclick="goToDetail(${book.id})"
      role="listitem"
      tabindex="0"
-     onkeydown="if(event.key==='Enter')openDetail(${book.id})">
+     onkeydown="if(event.key==='Enter')goToDetail(${book.id})">
       <div class="card-cover-wrap">
         <img src="${escapeHtml(cover)}" class="main-cover" alt="${escapeHtml(book.name)}" loading="lazy">
         <div class="card-cover-overlay">
@@ -776,3 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTagFilter();
   render();
 });
+
+function goToDetail(id) {
+  window.location.href = `detail.html?id=${id}`;
+}
