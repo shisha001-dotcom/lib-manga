@@ -44,7 +44,11 @@ function createBookCard(book) {
   const badgeClass = getBadgeClass(book.owned, book.total);
 
   const card = document.createElement("div");
-  card.className = "book-card";
+card.className = "book-card";
+
+card.addEventListener("click", () => {
+  window.location.href = `book-detail.html?id=${book.id}`;
+});
 
   card.innerHTML = `
     <div class="book-cover" style="background-image:url('${book.cover}')">
