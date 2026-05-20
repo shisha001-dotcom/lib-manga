@@ -3,185 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 Manga Collection</title>
+  <title>Quản lý kho sách</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ─── Toast Container ─── -->
-<div class="toast-container" id="toastContainer"></div>
+<div class="app">
 
-<!-- ─── Delete Confirm Modal ─── -->
-<div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-  <div class="modal">
-    <h2 id="deleteModalTitle">🗑️ Xóa bộ truyện?</h2>
-    <p>
-      Bạn có chắc muốn xóa
-      <strong id="modalBookName"></strong>
-      khỏi kho không? Hành động này không thể hoàn tác.
-    </p>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeDeleteModal()">Hủy</button>
-      <button class="modal-confirm" onclick="executeDelete()">Xóa</button>
-    </div>
-  </div>
-</div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h1>📚 Kho Sách</h1>
 
-<!-- ─── Edit Modal ─── -->
-<div class="modal-backdrop" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
-  <div class="modal modal-edit">
-    <div class="edit-modal-header">
-      <h2 id="editModalTitle">✏️ Chỉnh sửa truyện</h2>
-      <button class="modal-close-btn" onclick="closeEditModal()" title="Đóng">✕</button>
+    <nav>
+      <button class="nav-btn active">Tất cả</button>
+      <button class="nav-btn" data-filter="incomplete">Chưa đủ bộ</button>
+      <button class="nav-btn" data-filter="complete">Full bộ</button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <div class="topbar">
+      <input type="text" id="searchInput" placeholder="Tìm sách...">
     </div>
 
-    <div class="form-group">
-      <label for="bookName">Tên truyện <span style="color:var(--rose)">*</span></label>
-      <input type="text" id="bookName" placeholder="Ví dụ: Naruto" autocomplete="off">
-      <div class="field-error" id="bookNameError"></div>
-    </div>
+    <!-- Shelf sections -->
+    <section>
+      <h2>📖 Đang đọc</h2>
+      <div id="readingShelf" class="book-grid"></div>
+    </section>
 
-    <div class="form-group">
-      <label for="bookVolumes">
-        Các tập đang có <span style="color:var(--rose)">*</span>
-        <span class="label-hint">Nhập số cách nhau bởi dấu phẩy. Ví dụ: 1,2,3,5,7 hoặc dải 1-10,12</span>
-      </label>
-      <input type="text" id="bookVolumes" placeholder="1,2,3,5,7  hoặc  1-10,12">
-      <div class="field-error" id="bookVolumesError"></div>
-    </div>
+    <section>
+      <h2>🕒 Sắp đọc</h2>
+      <div id="nextShelf" class="book-grid"></div>
+    </section>
 
-    <div class="form-group">
-      <label for="totalVolumes2">Tổng số tập của bộ</label>
-      <input type="number" id="totalVolumes2" min="1" placeholder="Ví dụ: 72 (để tính tập thiếu)">
-    </div>
+    <section>
+      <h2>✅ Hoàn thành</h2>
+      <div id="finishedShelf" class="book-grid"></div>
+    </section>
 
-    <div class="form-group">
-      <label for="bookTags">Thể loại / Tags</label>
-      <input type="text" id="bookTags" placeholder="Shounen, Action, Fantasy" autocomplete="off">
-    </div>
-
-    <div class="form-group">
-      <label for="bookCover">Ảnh bìa bộ truyện (URL)</label>
-      <input type="url" id="bookCover" placeholder="https://...">
-      <img id="coverPreview" class="cover-preview" alt="Preview ảnh bìa">
-    </div>
-
-    <div class="form-group">
-      <label for="volumeCovers">
-        Ảnh bìa từng tập
-        <span class="label-hint">(tùy chọn) — mỗi dòng: Tập 1|https://...</span>
-      </label>
-      <textarea id="volumeCovers" placeholder="Tập 1|https://...
-Tập 2|https://..."></textarea>
-    </div>
-
-    <div class="edit-modal-footer">
-      <button class="modal-cancel" onclick="closeEditModal()">Hủy</button>
-      <button class="modal-save" onclick="saveEdit()">💾 Lưu thay đổi</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── Book Detail Modal ─── -->
-<div class="modal-backdrop" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
-  <div class="modal modal-detail">
-    <button class="modal-close-btn detail-close" onclick="closeDetailModal()" title="Đóng">✕</button>
-    <div id="detailContent"></div>
-  </div>
-</div>
-
-<!-- ─── App ─── -->
-<div class="app-wrapper">
-
-  <!-- Header -->
-  <header class="header">
-    <div class="logo">
-      <div class="logo-icon">📚</div>
-      <div class="logo-text">Manga <span>Collection</span></div>
-    </div>
-
-    <div class="header-right">
-      <!-- Search -->
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Tìm tên, thể loại…"
-          aria-label="Tìm kiếm truyện"
-          autocomplete="off"
-        >
-      </div>
-
-      <!-- Tag Filter Chips (populated by JS) -->
-      <div class="tag-filter-wrap" id="tagFilterWrap"></div>
-
-      <!-- Sort -->
-      <select class="sort-select" id="sortSelect" aria-label="Sắp xếp">
-        <option value="newest">Mới nhất</option>
-        <option value="oldest">Cũ nhất</option>
-        <option value="az">A → Z</option>
-        <option value="za">Z → A</option>
-        <option value="most">Nhiều tập nhất</option>
-        <option value="missing">Thiếu nhiều nhất</option>
-      </select>
-    </div>
-  </header>
-
-  <!-- Stats Row -->
-  <div class="stats-row" role="region" aria-label="Thống kê">
-    <div class="stat-card">
-      <div class="stat-icon purple">📚</div>
-      <div class="stat-body">
-        <h3>Tổng bộ truyện</h3>
-        <div class="num" id="statTotal">0</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon green">📦</div>
-      <div class="stat-body">
-        <h3>Tổng tập đang có</h3>
-        <div class="num" id="statVolumes">0</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon rose">⚠️</div>
-      <div class="stat-body">
-        <h3>Bộ đang thiếu tập</h3>
-        <div class="num" id="statMissing">0</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon amber">✅</div>
-      <div class="stat-body">
-        <h3>Bộ đã đủ</h3>
-        <div class="num" id="statComplete">0</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Book Grid -->
-  <main>
-    <div class="grid-header">
-      <h2>Kho truyện</h2>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span class="count-badge"><span id="filteredCount">0</span> bộ</span>
-        <div class="view-toggle" role="group" aria-label="Chế độ xem">
-          <button class="view-btn active" id="viewGrid" title="Lưới" aria-pressed="true">⊞</button>
-          <button class="view-btn" id="viewList" title="Danh sách" aria-pressed="false">☰</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="book-grid" id="bookGrid" role="list" aria-label="Danh sách truyện">
-      <!-- Cards rendered by JS -->
-    </div>
   </main>
-
 </div>
 
-<script src="app.js"></script>
+<script src="data/books.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>
