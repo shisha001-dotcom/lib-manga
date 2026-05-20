@@ -6,7 +6,7 @@ books.push({
 
   volumes: [
     { number: 1, owned: true, cover: "https://cdn1.fahasa.com/media/catalog/product/i/m/image_63429.jpg" },
-    { number: 2, owned: true, cover: "https://via.placeholder.com/120x180?text=Conan+2" },
-    { number: 3, owned: false, cover: "https://via.placeholder.com/120x180?text=Conan+3" }
+    { number: 2, owned: true, cover: "https://cdn1.fahasa.com/media/catalog/product/t/h/tham-tu-lung-danh-conan---tap-2---tb-2023.jpg" },
+    { number: 3, owned: false, cover: "https://cdn1.fahasa.com/media/catalog/product/t/h/tham-tu-lung-danh-conan---tap-3---tb-2023.jpg" }
   ]
 });
