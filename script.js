@@ -126,4 +126,6 @@ navButtons.forEach(btn => {
 });
 
 /* ===== First load ===== */
-renderBooks();
+window.addEventListener("booksLoaded", () => {
+  renderBooks();
+});
