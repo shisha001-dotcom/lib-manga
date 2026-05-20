@@ -2,7 +2,7 @@ books.push({
   id: "conan",
   title: "Conan",
   author: "Gosho Aoyama",
-  shelf: "reading",
+  shelf: "next",
 
   volumes: [
     { number: 1, owned: true, cover: "https://via.placeholder.com/120x180?text=Conan+1" },
