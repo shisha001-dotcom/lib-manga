@@ -1,56 +1,37 @@
 const books = [
   {
-    title: "One Piece",
-    author: "Eiichiro Oda",
-    shelf: "reading",
-    owned: 85,
-    total: 105,
-    progress: 60,
-    cover: "https://via.placeholder.com/160x220?text=One+Piece"
-  },
-  {
+    id: "conan",
     title: "Conan",
     author: "Gosho Aoyama",
     shelf: "reading",
-    owned: 95,
-    total: 105,
     progress: 70,
-    cover: "https://via.placeholder.com/160x220?text=Conan"
+
+    volumes: [
+      { number: 1, owned: true, cover: "https://via.placeholder.com/120x180?text=Conan+1" },
+      { number: 2, owned: true, cover: "https://via.placeholder.com/120x180?text=Conan+2" },
+      { number: 3, owned: true, cover: "https://via.placeholder.com/120x180?text=Conan+3" },
+      { number: 4, owned: false, cover: "https://via.placeholder.com/120x180?text=Conan+4" },
+      { number: 5, owned: false, cover: "https://via.placeholder.com/120x180?text=Conan+5" }
+    ]
   },
+
   {
-    title: "Doraemon",
-    author: "Fujiko F Fujio",
-    shelf: "next",
-    owned: 20,
-    total: 45,
-    progress: 0,
-    cover: "https://via.placeholder.com/160x220?text=Doraemon"
-  },
-  {
-    title: "Naruto",
-    author: "Masashi Kishimoto",
-    shelf: "next",
-    owned: 72,
-    total: 72,
-    progress: 0,
-    cover: "https://via.placeholder.com/160x220?text=Naruto"
-  },
-  {
-    title: "Attack on Titan",
-    author: "Hajime Isayama",
-    shelf: "finished",
-    owned: 34,
-    total: 34,
-    progress: 100,
-    cover: "https://via.placeholder.com/160x220?text=AOT"
-  },
-  {
-    title: "Death Note",
-    author: "Tsugumi Ohba",
-    shelf: "finished",
-    owned: 12,
-    total: 12,
-    progress: 100,
-    cover: "https://via.placeholder.com/160x220?text=Death+Note"
+    id: "onepiece",
+    title: "One Piece",
+    author: "Eiichiro Oda",
+    shelf: "reading",
+    progress: 60,
+
+    volumes: [
+      { number: 1, owned: true, cover: "https://via.placeholder.com/120x180?text=OP+1" },
+      { number: 2, owned: true, cover: "https://via.placeholder.com/120x180?text=OP+2" },
+      { number: 3, owned: false, cover: "https://via.placeholder.com/120x180?text=OP+3" }
+    ]
   }
 ];
+
+/* Tự tính owned + total */
+books.forEach(book => {
+  book.owned = book.volumes.filter(v => v.owned).length;
+  book.total = book.volumes.length;
+});
