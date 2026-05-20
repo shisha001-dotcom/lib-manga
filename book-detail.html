@@ -24,26 +24,27 @@
 
 <script src="data/books.js"></script>
 <script>
-/* ===== Lấy id từ URL ===== */
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get("id");
-
-const book = books.find(b => b.id === bookId);
 
 const titleEl = document.getElementById("bookTitle");
 const progressEl = document.getElementById("bookProgress");
 const gridEl = document.getElementById("volumesGrid");
 
-if (!book) {
-  titleEl.innerText = "Không tìm thấy bộ truyện";
-} else {
+window.addEventListener("booksLoaded", () => {
+  const book = books.find(b => b.id === bookId);
+
+  if (!book) {
+    titleEl.innerText = "Không tìm thấy bộ truyện";
+    return;
+  }
+
   titleEl.innerText = book.title;
   progressEl.innerText = `${book.owned}/${book.total} tập`;
 
   renderVolumes(book);
-}
+});
 
-/* ===== Render tập truyện ===== */
 function renderVolumes(book) {
   gridEl.innerHTML = "";
 
@@ -57,11 +58,7 @@ function renderVolumes(book) {
 
     card.innerHTML = `
       <div class="volume-cover" style="background-image:url('${volume.cover}')">
-        ${
-          volume.owned
-            ? `<div class="owned-check">✓</div>`
-            : ""
-        }
+        ${volume.owned ? `<div class="owned-check">✓</div>` : ""}
       </div>
 
       <div class="volume-number">
@@ -77,6 +74,5 @@ function goBack() {
   window.history.back();
 }
 </script>
-
 </body>
 </html>
