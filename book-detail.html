@@ -14,7 +14,18 @@
     <button onclick="goBack()">← Quay lại</button>
     <h1 id="bookTitle">Tên bộ truyện</h1>
     <p id="bookProgress">0/0 tập</p>
-  </header>
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">
+      Tất cả <span id="countAll" class="filter-count">0</span>
+    </button>
+    <button class="filter-btn" data-filter="owned" onclick="setFilter('owned', this)">
+      ✓ Đã có <span id="countOwned" class="filter-count owned">0</span>
+    </button>
+    <button class="filter-btn" data-filter="missing" onclick="setFilter('missing', this)">
+      ✗ Chưa có <span id="countMissing" class="filter-count missing">0</span>
+    </button>
+  </div>
+</header>
 
   <section class="detail-grid" id="volumesGrid">
     <!-- render bằng JS -->
@@ -31,48 +42,69 @@ const titleEl = document.getElementById("bookTitle");
 const progressEl = document.getElementById("bookProgress");
 const gridEl = document.getElementById("volumesGrid");
 
+let currentBook = null;
+let currentFilter = "all";
+
 window.addEventListener("booksLoaded", () => {
   const book = books.find(b => b.id === bookId);
+  if (!book) { titleEl.innerText = "Không tìm thấy bộ truyện"; return; }
 
-  if (!book) {
-    titleEl.innerText = "Không tìm thấy bộ truyện";
-    return;
-  }
-
+  currentBook = book;
   titleEl.innerText = book.title;
   progressEl.innerText = `${book.owned}/${book.total} tập`;
 
+  updateCounts(book);
   renderVolumes(book);
 });
+
+function updateCounts(book) {
+  const total = book.volumes.length;
+  const owned = book.volumes.filter(v => v.owned).length;
+  const missing = total - owned;
+
+  document.getElementById("countAll").textContent = total;
+  document.getElementById("countOwned").textContent = owned;
+  document.getElementById("countMissing").textContent = missing;
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderVolumes(currentBook);
+}
 
 function renderVolumes(book) {
   gridEl.innerHTML = "";
 
-  book.volumes.forEach(volume => {
+  const filtered = book.volumes.filter(v => {
+    if (currentFilter === "owned") return v.owned;
+    if (currentFilter === "missing") return !v.owned;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    gridEl.innerHTML = `<p class="empty-msg">Không có tập nào.</p>`;
+    return;
+  }
+
+  filtered.forEach(volume => {
     const card = document.createElement("div");
     card.className = "volume-card";
-
-    if (!volume.owned) {
-      card.classList.add("missing");
-    }
+    if (!volume.owned) card.classList.add("missing");
 
     card.innerHTML = `
       <div class="volume-cover" style="background-image:url('${volume.cover}')">
-        ${volume.owned ? `<div class="owned-check">✓</div>` : ""}
+        ${volume.owned ? `<div class="owned-check">✓</div>` : `<div class="missing-mark">✗</div>`}
       </div>
-
-      <div class="volume-number">
-        Tập ${volume.number}
-      </div>
+      <div class="volume-number">Tập ${volume.number}</div>
     `;
 
     gridEl.appendChild(card);
   });
 }
 
-function goBack() {
-  window.history.back();
-}
+function goBack() { window.history.back(); }
 </script>
 </body>
 </html>
