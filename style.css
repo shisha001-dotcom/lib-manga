@@ -93,6 +93,7 @@ section h2 {
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
   position: relative;
   transition: 0.2s;
+  cursor: pointer;
 }
 
 .book-card:hover {
@@ -120,18 +121,9 @@ section h2 {
   color: white;
 }
 
-.badge-complete {
-  background: #2ecc71;
-}
-
-.badge-mid {
-  background: #f1c40f;
-  color: black;
-}
-
-.badge-low {
-  background: #e74c3c;
-}
+.badge-complete { background: #2ecc71; }
+.badge-mid { background: #f1c40f; color: black; }
+.badge-low { background: #e74c3c; }
 
 /* Book Info */
 .book-title {
@@ -208,7 +200,7 @@ section h2 {
   margin-bottom: 30px;
 }
 
-.detail-header button {
+.detail-header > button {
   padding: 10px 14px;
   border: none;
   border-radius: 10px;
@@ -246,6 +238,7 @@ section h2 {
   background-position: center;
   border-radius: 10px;
   position: relative;
+  cursor: zoom-in;
 }
 
 /* Chưa có -> xám */
@@ -269,6 +262,45 @@ section h2 {
   font-weight: bold;
 }
 
+/* Dấu X cho tập chưa có */
+.missing-mark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+/* Zoom hint - hiện khi hover */
+.cover-zoom-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(0,0,0,0.55);
+  color: white;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.volume-cover:hover .cover-zoom-hint {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .volume-number {
   text-align: center;
   margin-top: 10px;
@@ -276,7 +308,7 @@ section h2 {
   font-weight: bold;
 }
 
-/* Filter bar trong detail page */
+/* Filter bar */
 .filter-bar {
   display: flex;
   gap: 10px;
@@ -323,26 +355,117 @@ section h2 {
 .filter-count.owned  { background: #d4edda; color: #2ecc71; }
 .filter-count.missing { background: #fde8e8; color: #e74c3c; }
 
-/* Dấu X cho tập chưa có */
-.missing-mark {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #e74c3c;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 13px;
-}
-
 /* Empty state */
 .empty-msg {
   color: #999;
   font-size: 15px;
   padding: 20px 0;
+}
+
+/* ================= LIGHTBOX ================= */
+
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  animation: lbFadeIn 0.2s ease;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+@keyframes lbFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.lightbox-content img {
+  max-width: min(400px, 80vw);
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  animation: lbZoomIn 0.2s ease;
+}
+
+@keyframes lbZoomIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.lightbox-caption {
+  color: rgba(255,255,255,0.75);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 22px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 1001;
+}
+
+.lightbox-close:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.lightbox-prev,
+.lightbox-next {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  font-size: 42px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+@media (max-width: 600px) {
+  .lightbox-prev,
+  .lightbox-next {
+    width: 38px;
+    height: 38px;
+    font-size: 28px;
+  }
 }
