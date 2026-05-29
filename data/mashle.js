@@ -2,7 +2,7 @@ books.push({
   id: "mashle",
   title: "Mashle",
   author: "Hajime Kōmoto",
-  shelf: "next",
+  shelf: "finished",
 
   volumes: [
     { number: 1, owned: true, cover: "https://cdn1.fahasa.com/media/catalog/product/m/a/mashle_tap-1_bia.jpg" },
