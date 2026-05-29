@@ -6,7 +6,8 @@ const bookFiles = [
   "onepiece",
   "ajin",
   "mashle",
-  "rave"
+  "rave",
+  "fireforce"
 ];
 
 /* Load từng file */
