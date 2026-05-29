@@ -14,23 +14,34 @@
     <button onclick="goBack()">← Quay lại</button>
     <h1 id="bookTitle">Tên bộ truyện</h1>
     <p id="bookProgress">0/0 tập</p>
-  <div class="filter-bar">
-    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">
-      Tất cả <span id="countAll" class="filter-count">0</span>
-    </button>
-    <button class="filter-btn" data-filter="owned" onclick="setFilter('owned', this)">
-      ✓ Đã có <span id="countOwned" class="filter-count owned">0</span>
-    </button>
-    <button class="filter-btn" data-filter="missing" onclick="setFilter('missing', this)">
-      ✗ Chưa có <span id="countMissing" class="filter-count missing">0</span>
-    </button>
-  </div>
-</header>
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">
+        Tất cả <span id="countAll" class="filter-count">0</span>
+      </button>
+      <button class="filter-btn" data-filter="owned" onclick="setFilter('owned', this)">
+        ✓ Đã có <span id="countOwned" class="filter-count owned">0</span>
+      </button>
+      <button class="filter-btn" data-filter="missing" onclick="setFilter('missing', this)">
+        ✗ Chưa có <span id="countMissing" class="filter-count missing">0</span>
+      </button>
+    </div>
+  </header>
 
   <section class="detail-grid" id="volumesGrid">
     <!-- render bằng JS -->
   </section>
 
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-prev" onclick="lightboxPrev(event)">‹</button>
+  <div class="lightbox-content" onclick="event.stopPropagation()">
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+  <button class="lightbox-next" onclick="lightboxNext(event)">›</button>
 </div>
 
 <script src="data/books.js"></script>
@@ -44,6 +55,8 @@ const gridEl = document.getElementById("volumesGrid");
 
 let currentBook = null;
 let currentFilter = "all";
+let filteredVolumes = [];
+let lightboxIndex = 0;
 
 window.addEventListener("booksLoaded", () => {
   const book = books.find(b => b.id === bookId);
@@ -77,18 +90,18 @@ function setFilter(filter, btn) {
 function renderVolumes(book) {
   gridEl.innerHTML = "";
 
-  const filtered = book.volumes.filter(v => {
+  filteredVolumes = book.volumes.filter(v => {
     if (currentFilter === "owned") return v.owned;
     if (currentFilter === "missing") return !v.owned;
     return true;
   });
 
-  if (filtered.length === 0) {
+  if (filteredVolumes.length === 0) {
     gridEl.innerHTML = `<p class="empty-msg">Không có tập nào.</p>`;
     return;
   }
 
-  filtered.forEach(volume => {
+  filteredVolumes.forEach((volume, idx) => {
     const card = document.createElement("div");
     card.className = "volume-card";
     if (!volume.owned) card.classList.add("missing");
@@ -96,13 +109,67 @@ function renderVolumes(book) {
     card.innerHTML = `
       <div class="volume-cover" style="background-image:url('${volume.cover}')">
         ${volume.owned ? `<div class="owned-check">✓</div>` : `<div class="missing-mark">✗</div>`}
+        <div class="cover-zoom-hint">🔍</div>
       </div>
       <div class="volume-number">Tập ${volume.number}</div>
     `;
 
+    card.querySelector(".volume-cover").addEventListener("click", () => {
+      openLightbox(idx);
+    });
+
     gridEl.appendChild(card);
   });
 }
+
+/* ===== Lightbox ===== */
+function openLightbox(idx) {
+  lightboxIndex = idx;
+  showLightboxAt(idx);
+  document.getElementById("lightbox").classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+function showLightboxAt(idx) {
+  const volume = filteredVolumes[idx];
+  document.getElementById("lightboxImg").src = volume.cover;
+  document.getElementById("lightboxCaption").textContent =
+    `${currentBook.title} — Tập ${volume.number}`;
+
+  // Ẩn/hiện nút prev/next
+  document.querySelector(".lightbox-prev").style.visibility = idx === 0 ? "hidden" : "visible";
+  document.querySelector(".lightbox-next").style.visibility = idx === filteredVolumes.length - 1 ? "hidden" : "visible";
+}
+
+function lightboxPrev(e) {
+  e.stopPropagation();
+  if (lightboxIndex > 0) {
+    lightboxIndex--;
+    showLightboxAt(lightboxIndex);
+  }
+}
+
+function lightboxNext(e) {
+  e.stopPropagation();
+  if (lightboxIndex < filteredVolumes.length - 1) {
+    lightboxIndex++;
+    showLightboxAt(lightboxIndex);
+  }
+}
+
+// Phím tắt: mũi tên trái/phải, Esc
+document.addEventListener("keydown", e => {
+  const lb = document.getElementById("lightbox");
+  if (!lb.classList.contains("active")) return;
+  if (e.key === "ArrowLeft") lightboxPrev(e);
+  if (e.key === "ArrowRight") lightboxNext(e);
+  if (e.key === "Escape") closeLightbox();
+});
 
 function goBack() { window.history.back(); }
 </script>
