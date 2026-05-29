@@ -275,3 +275,74 @@ section h2 {
   font-size: 14px;
   font-weight: bold;
 }
+
+/* Filter bar trong detail page */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 2px solid #ddd;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-btn:hover {
+  border-color: #d4b483;
+}
+
+.filter-btn.active {
+  background: #d4b483;
+  border-color: #d4b483;
+  color: white;
+}
+
+.filter-btn.active .filter-count {
+  background: rgba(255,255,255,0.3);
+  color: white;
+}
+
+.filter-count {
+  background: #eee;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 12px;
+}
+
+.filter-count.owned  { background: #d4edda; color: #2ecc71; }
+.filter-count.missing { background: #fde8e8; color: #e74c3c; }
+
+/* Dấu X cho tập chưa có */
+.missing-mark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+/* Empty state */
+.empty-msg {
+  color: #999;
+  font-size: 15px;
+  padding: 20px 0;
+}
