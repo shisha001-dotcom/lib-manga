@@ -2,7 +2,7 @@ books.push({
   id: "ajin",
   title: "Ajin",
   author: "Gamon Sakurai",
-  shelf: "next",
+  shelf: "finished",
 
   volumes: [
     { number: 1, owned: true, cover: "https://static.wikia.nocookie.net/ajin/images/0/0e/Volume_1.jpg" },
