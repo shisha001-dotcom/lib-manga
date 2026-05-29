@@ -3,7 +3,9 @@ const books = [];
 /* Danh sách file truyện */
 const bookFiles = [
   "conan",
-  "onepiece"
+  "onepiece",
+  "ajin",
+  "mashle"
 ];
 
 /* Load từng file */
