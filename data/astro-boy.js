@@ -2,7 +2,7 @@ books.push({
   id: "astro-boy",
   title: "Astro Boy - Atom Cậu Bé Tay Sắt",
   author: "Osamu Tezuka",
-  shelf: "next",
+  shelf: "finished",
 
   volumes: [
     { number: 1, owned: true, cover: "https://cdn1.fahasa.com/media/catalog/product/a/s/astro-boy_tap-1_bia.jpg" },
