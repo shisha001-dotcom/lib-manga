@@ -2,7 +2,7 @@ books.push({
   id: "thanh-thach-rave",
   title: "Thánh Thạch Rave",
   author: "Hiro Mashima",
-  shelf: "next",
+  shelf: "finished",
 
   volumes: [
     { number: 1, owned: true, cover: "https://cdn1.fahasa.com/media/catalog/product/t/h/thanh_thach_rave_bia_tap_1.jpg" },
