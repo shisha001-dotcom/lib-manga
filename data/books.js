@@ -9,7 +9,8 @@ const bookFiles = [
   "rave",
   "fireforce",
   "dr-stone",
-  "astro-boy"
+  "astro-boy",
+  "hitman-reborn"
 ];
 
 /* Load từng file */
