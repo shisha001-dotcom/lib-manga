@@ -2,7 +2,7 @@ books.push({
   id: "dr-stone",
   title: "Dr. Stone",
   author: "Riichiro Inagaki, Boichi",
-  shelf: "next",
+  shelf: "finished",
 
   volumes: [
     { number: 1, owned: true, cover: "https://cdn1.fahasa.com/media/catalog/product/d/r/dr.-stone_bia_tap-1.jpg" },
