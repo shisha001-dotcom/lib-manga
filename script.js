@@ -67,7 +67,7 @@ card.addEventListener("click", () => {
         <div class="progress-bar">
           <div class="progress-fill" style="width:${book.progress}%"></div>
         </div>
-        <div class="progress-text">${book.progress}% đã đọc</div>
+        <div class="progress-text">${book.progress}% sưu tầm</div>
       </div>
     `
         : ""
