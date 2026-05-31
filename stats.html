@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thống kê</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ===== STATS PAGE ===== */
+    .stats-page {
+      padding: 25px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .stats-topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stats-topbar h1 {
+      font-size: 26px;
+      color: var(--text);
+    }
+
+    .back-btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: var(--nav-btn-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .back-btn:hover { background: var(--nav-btn-hover); }
+
+    /* ===== CARDS ROW ===== */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-card .stat-icon { font-size: 28px; }
+    .stat-card .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
+    .stat-card .stat-label { font-size: 13px; color: var(--text-muted); }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== SHELF CHART ===== */
+    .shelf-section { margin-bottom: 40px; }
+
+    .shelf-chart {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .shelf-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .shelf-row:last-child { margin-bottom: 0; }
+
+    .shelf-label {
+      width: 130px;
+      font-size: 14px;
+      color: var(--text);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .shelf-bar-wrap {
+      flex: 1;
+      background: var(--progress-bg);
+      border-radius: 10px;
+      height: 22px;
+      overflow: hidden;
+    }
+
+    .shelf-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.8s ease;
+    }
+
+    .shelf-bar-fill.reading { background: #3b82f6; }
+    .shelf-bar-fill.next    { background: var(--accent); }
+    .shelf-bar-fill.finished{ background: #2ecc71; }
+
+    .shelf-stat {
+      width: 80px;
+      text-align: right;
+      font-size: 13px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* ===== MISSING SECTION ===== */
+    .missing-section { margin-bottom: 40px; }
+
+    .missing-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .missing-item {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 16px 20px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      text-decoration: none;
+    }
+    .missing-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .missing-cover {
+      width: 48px;
+      height: 64px;
+      border-radius: 8px;
+      background-size: cover;
+      background-position: center;
+      background-color: var(--nav-btn-bg);
+      flex-shrink: 0;
+    }
+
+    .missing-info { flex: 1; min-width: 0; }
+    .missing-title { font-weight: bold; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+
+    .missing-bar-wrap {
+      background: var(--progress-bg);
+      border-radius: 10px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .missing-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 10px;
+    }
+    .missing-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .missing-badge {
+      background: #fde8e8;
+      color: #e74c3c;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .missing-badge { background: #3a1a1a; color: #f87171; }
+
+    .all-complete {
+      color: var(--text-muted);
+      font-size: 15px;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .stats-page { padding: 70px 16px 20px; }
+      .shelf-label { width: 100px; font-size: 13px; }
+      .shelf-stat  { width: 60px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stats-page">
+
+  <div class="stats-topbar">
+    <button class="back-btn" onclick="window.location.href='index.html'">← Quay lại</button>
+    <h1>📊 Thống kê</h1>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="stat-cards" id="statCards"></div>
+
+  <!-- Shelf distribution -->
+  <div class="shelf-section">
+    <div class="section-header">🗂 Phân bổ theo kệ sách</div>
+    <div class="shelf-chart" id="shelfChart"></div>
+  </div>
+
+  <!-- Missing volumes -->
+  <div class="missing-section">
+    <div class="section-header">🛒 Tập đang thiếu</div>
+    <div class="missing-list" id="missingList"></div>
+  </div>
+
+</div>
+
+<script src="data/books.js"></script>
+<script>
+/* ===== Dark mode sync ===== */
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+
+/* ===== Render after data loaded ===== */
+window.addEventListener("booksLoaded", () => {
+  renderStatCards();
+  renderShelfChart();
+  renderMissingList();
+});
+
+/* ===== Summary cards ===== */
+function renderStatCards() {
+  const totalSeries  = books.length;
+  const totalOwned   = books.reduce((s, b) => s + b.owned, 0);
+  const totalVolumes = books.reduce((s, b) => s + b.total, 0);
+  const totalMissing = totalVolumes - totalOwned;
+  const completeSeries = books.filter(b => b.owned === b.total).length;
+
+  const cards = [
+    { icon: "📚", value: totalSeries,    label: "Bộ truyện" },
+    { icon: "📖", value: totalOwned,     label: "Tập đang có" },
+    { icon: "❌", value: totalMissing,   label: "Tập đang thiếu" },
+    { icon: "✅", value: completeSeries, label: "Bộ đã đủ" },
+  ];
+
+  document.getElementById("statCards").innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="stat-icon">${c.icon}</div>
+      <div class="stat-value">${c.value}</div>
+      <div class="stat-label">${c.label}</div>
+    </div>
+  `).join("");
+}
+
+/* ===== Shelf chart ===== */
+function renderShelfChart() {
+  const shelfMeta = {
+    reading:  { label: "📖 Chưa đủ bộ", cls: "reading" },
+    next:     { label: "🕒 Wishlist",    cls: "next"    },
+    finished: { label: "✅ Hoàn thành",  cls: "finished"},
+  };
+
+  const counts = { reading: 0, next: 0, finished: 0 };
+  const volumes = { reading: 0, next: 0, finished: 0 };
+
+  books.forEach(b => {
+    if (counts[b.shelf] !== undefined) {
+      counts[b.shelf]++;
+      volumes[b.shelf] += b.owned;
+    }
+  });
+
+  const maxCount = Math.max(...Object.values(counts), 1);
+
+  document.getElementById("shelfChart").innerHTML = Object.entries(shelfMeta).map(([key, meta]) => `
+    <div class="shelf-row">
+      <div class="shelf-label">${meta.label}</div>
+      <div class="shelf-bar-wrap">
+        <div class="shelf-bar-fill ${meta.cls}"
+             style="width: ${Math.round((counts[key] / maxCount) * 100)}%"></div>
+      </div>
+      <div class="shelf-stat">
+        ${counts[key]} bộ · ${volumes[key]} tập
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ===== Missing list ===== */
+function renderMissingList() {
+  const missing = books
+    .filter(b => b.owned < b.total)
+    .sort((a, b) => (b.owned / b.total) - (a.owned / a.total)); // gần đủ nhất lên đầu
+
+  const el = document.getElementById("missingList");
+
+  if (missing.length === 0) {
+    el.innerHTML = `<div class="all-complete">🎉 Tất cả bộ đều đã đủ tập!</div>`;
+    return;
+  }
+
+  el.innerHTML = missing.map(book => {
+    const lack = book.total - book.owned;
+    const pct  = Math.round((book.owned / book.total) * 100);
+    return `
+      <a class="missing-item"
+         href="book-detail.html?id=${book.id}&filter=missing"
+         onclick="sessionStorage.setItem('detailFilter','missing')">
+        <div class="missing-cover" style="background-image:url('${book.cover}')"></div>
+        <div class="missing-info">
+          <div class="missing-title">${book.title}</div>
+          <div class="missing-bar-wrap">
+            <div class="missing-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="missing-sub">${book.owned}/${book.total} tập · ${pct}%</div>
+        </div>
+        <div class="missing-badge">−${lack} tập</div>
+      </a>
+    `;
+  }).join("");
+}
+</script>
+</body>
+</html>
