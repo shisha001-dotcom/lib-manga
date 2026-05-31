@@ -8,10 +8,16 @@
 </head>
 <body>
 
+<!-- Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Hamburger (mobile) -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+
 <div class="app">
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <h1>📚 Kho Sách</h1>
 
     <nav>
@@ -19,6 +25,13 @@
       <button class="nav-btn" data-filter="incomplete">Chưa đủ bộ</button>
       <button class="nav-btn" data-filter="complete">Full bộ</button>
     </nav>
+
+    <div class="sidebar-bottom">
+      <button class="dark-toggle" id="darkToggle" onclick="toggleDark()">
+        <span class="toggle-icon">🌙</span>
+        <span class="toggle-label">Chế độ tối</span>
+      </button>
+    </div>
   </aside>
 
   <!-- Main -->
@@ -28,7 +41,6 @@
       <input type="text" id="searchInput" placeholder="Tìm sách...">
     </div>
 
-    <!-- Shelf sections -->
     <section>
       <h2>📖 Chưa đủ bộ</h2>
       <div id="readingShelf" class="book-grid"></div>
@@ -49,6 +61,47 @@
 
 <script src="data/books.js"></script>
 <script src="script.js"></script>
+<script>
+/* ===== Dark mode ===== */
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const btn = document.getElementById('darkToggle');
+  btn.querySelector('.toggle-icon').textContent = dark ? '☀️' : '🌙';
+  btn.querySelector('.toggle-label').textContent = dark ? 'Chế độ sáng' : 'Chế độ tối';
+}
 
+function toggleDark() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = !isDark;
+  localStorage.setItem('theme', next ? 'dark' : 'light');
+  applyTheme(next);
+}
+
+// Load saved theme
+applyTheme(localStorage.getItem('theme') === 'dark');
+
+/* ===== Mobile sidebar ===== */
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) { closeSidebar(); } else {
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+  }
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// Close sidebar when a nav button is clicked on mobile
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  });
+});
+</script>
 </body>
 </html>
