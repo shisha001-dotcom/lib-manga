@@ -27,7 +27,7 @@ Promise.all(
     book.progress = Math.round((book.owned / book.total) * 100);
 
     /* lấy bìa đại diện từ tập 1 */
-    book.cover = book.volumes[0]?.cover || "";
+    book.cover = book.cover || book.volumes[0]?.cover || "";
   });
 
   window.dispatchEvent(new Event("booksLoaded"));
