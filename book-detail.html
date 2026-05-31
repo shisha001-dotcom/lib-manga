@@ -15,21 +15,19 @@
     <h1 id="bookTitle">Tên bộ truyện</h1>
     <p id="bookProgress">0/0 tập</p>
     <div class="filter-bar">
-      <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">
+      <button class="filter-btn active" onclick="setFilter('all', this)">
         Tất cả <span id="countAll" class="filter-count">0</span>
       </button>
-      <button class="filter-btn" data-filter="owned" onclick="setFilter('owned', this)">
+      <button class="filter-btn" onclick="setFilter('owned', this)">
         ✓ Đã có <span id="countOwned" class="filter-count owned">0</span>
       </button>
-      <button class="filter-btn" data-filter="missing" onclick="setFilter('missing', this)">
+      <button class="filter-btn" onclick="setFilter('missing', this)">
         ✗ Chưa có <span id="countMissing" class="filter-count missing">0</span>
       </button>
     </div>
   </header>
 
-  <section class="detail-grid" id="volumesGrid">
-    <!-- render bằng JS -->
-  </section>
+  <section class="detail-grid" id="volumesGrid"></section>
 
 </div>
 
@@ -46,12 +44,19 @@
 
 <script src="data/books.js"></script>
 <script>
+/* ===== Dark mode sync ===== */
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+
+/* ===== Book detail ===== */
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get("id");
 
-const titleEl = document.getElementById("bookTitle");
+const titleEl    = document.getElementById("bookTitle");
 const progressEl = document.getElementById("bookProgress");
-const gridEl = document.getElementById("volumesGrid");
+const gridEl     = document.getElementById("volumesGrid");
 
 let currentBook = null;
 let currentFilter = "all";
@@ -65,18 +70,15 @@ window.addEventListener("booksLoaded", () => {
   currentBook = book;
   titleEl.innerText = book.title;
   progressEl.innerText = `${book.owned}/${book.total} tập`;
-
   updateCounts(book);
   renderVolumes(book);
 });
 
 function updateCounts(book) {
-  const total = book.volumes.length;
-  const owned = book.volumes.filter(v => v.owned).length;
-  const missing = total - owned;
-
-  document.getElementById("countAll").textContent = total;
-  document.getElementById("countOwned").textContent = owned;
+  const owned   = book.volumes.filter(v => v.owned).length;
+  const missing = book.volumes.length - owned;
+  document.getElementById("countAll").textContent     = book.volumes.length;
+  document.getElementById("countOwned").textContent   = owned;
   document.getElementById("countMissing").textContent = missing;
 }
 
@@ -91,7 +93,7 @@ function renderVolumes(book) {
   gridEl.innerHTML = "";
 
   filteredVolumes = book.volumes.filter(v => {
-    if (currentFilter === "owned") return v.owned;
+    if (currentFilter === "owned")   return v.owned;
     if (currentFilter === "missing") return !v.owned;
     return true;
   });
@@ -103,21 +105,19 @@ function renderVolumes(book) {
 
   filteredVolumes.forEach((volume, idx) => {
     const card = document.createElement("div");
-    card.className = "volume-card";
-    if (!volume.owned) card.classList.add("missing");
+    card.className = "volume-card" + (volume.owned ? "" : " missing");
 
     card.innerHTML = `
       <div class="volume-cover" style="background-image:url('${volume.cover}')">
-        ${volume.owned ? `<div class="owned-check">✓</div>` : `<div class="missing-mark">✗</div>`}
+        ${volume.owned
+          ? `<div class="owned-check">✓</div>`
+          : `<div class="missing-mark">✗</div>`}
         <div class="cover-zoom-hint">🔍</div>
       </div>
       <div class="volume-number">Tập ${volume.number}</div>
     `;
 
-    card.querySelector(".volume-cover").addEventListener("click", () => {
-      openLightbox(idx);
-    });
-
+    card.querySelector(".volume-cover").addEventListener("click", () => openLightbox(idx));
     gridEl.appendChild(card);
   });
 }
@@ -140,35 +140,26 @@ function showLightboxAt(idx) {
   document.getElementById("lightboxImg").src = volume.cover;
   document.getElementById("lightboxCaption").textContent =
     `${currentBook.title} — Tập ${volume.number}`;
-
-  // Ẩn/hiện nút prev/next
   document.querySelector(".lightbox-prev").style.visibility = idx === 0 ? "hidden" : "visible";
   document.querySelector(".lightbox-next").style.visibility = idx === filteredVolumes.length - 1 ? "hidden" : "visible";
 }
 
 function lightboxPrev(e) {
   e.stopPropagation();
-  if (lightboxIndex > 0) {
-    lightboxIndex--;
-    showLightboxAt(lightboxIndex);
-  }
+  if (lightboxIndex > 0) showLightboxAt(--lightboxIndex);
 }
 
 function lightboxNext(e) {
   e.stopPropagation();
-  if (lightboxIndex < filteredVolumes.length - 1) {
-    lightboxIndex++;
-    showLightboxAt(lightboxIndex);
-  }
+  if (lightboxIndex < filteredVolumes.length - 1) showLightboxAt(++lightboxIndex);
 }
 
-// Phím tắt: mũi tên trái/phải, Esc
 document.addEventListener("keydown", e => {
   const lb = document.getElementById("lightbox");
   if (!lb.classList.contains("active")) return;
-  if (e.key === "ArrowLeft") lightboxPrev(e);
+  if (e.key === "ArrowLeft")  lightboxPrev(e);
   if (e.key === "ArrowRight") lightboxNext(e);
-  if (e.key === "Escape") closeLightbox();
+  if (e.key === "Escape")     closeLightbox();
 });
 
 function goBack() { window.history.back(); }
