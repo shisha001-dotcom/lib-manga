@@ -3,7 +3,7 @@ books.push({
   title: "Fire Force",
   author: "Atsushi Ohkubo",
   shelf: "finished",
-
+  cover: "https://www.nxbtre.com.vn/Images/Book/nxbtre_thumb_09132023_021300.jpg",
   volumes: [
     { number: 1, owned: true, cover: "https://vietbookstore.com/cdn/shop/files/fire_force_tap_1.jpg" },
     { number: 2, owned: true, cover: "https://vietbookstore.com/cdn/shop/files/fire_force_tap_2.jpg" },
