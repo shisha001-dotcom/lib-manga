@@ -11,7 +11,8 @@ const bookFiles = [
   "dr-stone",
   "astro-boy",
   "hitman-reborn",
-  "sakamoto-days"
+  "sakamoto-days",
+  "gachiakuta"
 ];
 
 /* Load từng file */
