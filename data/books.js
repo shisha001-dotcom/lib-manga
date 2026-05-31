@@ -8,7 +8,8 @@ const bookFiles = [
   "mashle",
   "rave",
   "fireforce",
-  "dr-stone"
+  "dr-stone",
+  "astro-boy"
 ];
 
 /* Load từng file */
