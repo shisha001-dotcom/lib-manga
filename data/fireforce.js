@@ -2,7 +2,7 @@ books.push({
   id: "fire-force",
   title: "Fire Force",
   author: "Atsushi Ohkubo",
-  shelf: "next",
+  shelf: "finished",
 
   volumes: [
     { number: 1, owned: true, cover: "https://vietbookstore.com/cdn/shop/files/fire_force_tap_1.jpg" },
