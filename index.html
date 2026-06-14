@@ -3,28 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý kho sách</title>
+  <title>Kho Sách</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Overlay (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
-<!-- Hamburger (mobile) -->
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
 
 <div class="app">
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <h1>📚 Kho Sách</h1>
+    <div class="sidebar-brand">
+      <h1>
+        <span class="brand-icon">📚</span>
+        Kho Sách
+      </h1>
+      <p>Bộ sưu tập manga</p>
+    </div>
 
     <nav>
-      <button class="nav-btn active">Tất cả</button>
-      <button class="nav-btn" data-filter="incomplete">Chưa đủ bộ</button>
-      <button class="nav-btn" data-filter="complete">Full bộ</button>
-      <button class="nav-btn" onclick="window.location.href='stats.html'">📊 Thống kê</button>
+      <button class="nav-btn active" data-filter="all">
+        📋 Tất cả
+      </button>
+      <button class="nav-btn" data-filter="incomplete">
+        🔖 Chưa đủ bộ
+      </button>
+      <button class="nav-btn" data-filter="complete">
+        ✅ Full bộ
+      </button>
+      <button class="nav-btn" onclick="window.location.href='stats.html'">
+        📊 Thống kê
+      </button>
     </nav>
 
     <div class="sidebar-bottom">
@@ -35,25 +45,34 @@
     </div>
   </aside>
 
-  <!-- Main -->
   <main class="main-content">
 
     <div class="topbar">
-      <input type="text" id="searchInput" placeholder="Tìm sách...">
+      <div class="topbar-title">Thư viện</div>
+      <input type="text" id="searchInput" placeholder="🔍 Tìm tên, tác giả...">
     </div>
 
     <section>
-      <h2>📖 Chưa đủ bộ</h2>
+      <div class="section-head">
+        <h2>📖 Chưa đủ bộ</h2>
+        <span class="section-count" id="countReading">0</span>
+      </div>
       <div id="readingShelf" class="book-grid"></div>
     </section>
 
     <section>
-      <h2>🕒 Wishlist</h2>
+      <div class="section-head">
+        <h2>🕒 Wishlist</h2>
+        <span class="section-count" id="countNext">0</span>
+      </div>
       <div id="nextShelf" class="book-grid"></div>
     </section>
 
     <section>
-      <h2>✅ Hoàn thành</h2>
+      <div class="section-head">
+        <h2>✅ Hoàn thành</h2>
+        <span class="section-count" id="countFinished">0</span>
+      </div>
       <div id="finishedShelf" class="book-grid"></div>
     </section>
 
@@ -78,7 +97,6 @@ function toggleDark() {
   applyTheme(next);
 }
 
-// Load saved theme
 applyTheme(localStorage.getItem('theme') === 'dark');
 
 /* ===== Mobile sidebar ===== */
@@ -97,7 +115,6 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('active');
 }
 
-// Close sidebar when a nav button is clicked on mobile
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (window.innerWidth <= 768) closeSidebar();
