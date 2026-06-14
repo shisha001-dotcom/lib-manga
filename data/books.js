@@ -1,37 +1,42 @@
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+
 const books = [];
 
-/* Danh sách file truyện */
-const bookFiles = [
-  "conan",
-  "onepiece",
-  "ajin",
-  "mashle",
-  "rave",
-  "fireforce",
-  "dr-stone",
-  "astro-boy",
-  "hitman-reborn",
-  "sakamoto-days",
-  "gachiakuta"
-];
+async function loadBooks() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/books?select=*,volumes(*)`,
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    }
+  );
+  const data = await res.json();
 
-/* Load từng file */
-Promise.all(
-  bookFiles.map(name =>
-    fetch(`data/${name}.js`)   // FIX
-      .then(res => res.text())
-      .then(code => eval(code))
-  )
-).then(() => {
+  data.forEach(b => {
+    const volumes = b.volumes
+      .sort((x, y) => x.number - y.number)
+      .map(v => ({ number: v.number, owned: v.owned, cover: v.cover }));
 
-  books.forEach(book => {
-    book.owned = book.volumes.filter(v => v.owned).length;
-    book.total = book.volumes.length;
-    book.progress = Math.round((book.owned / book.total) * 100);
+    const owned = volumes.filter(v => v.owned).length;
+    const total = volumes.length;
 
-    /* lấy bìa đại diện từ tập 1 */
-    book.cover = book.cover || book.volumes[0]?.cover || "";
+    books.push({
+      id: b.id,
+      title: b.title,
+      author: b.author,
+      shelf: b.shelf,
+      volumes,
+      owned,
+      total,
+      progress: Math.round((owned / total) * 100),
+      cover: b.cover_override || volumes[0]?.cover || ""
+    });
   });
 
   window.dispatchEvent(new Event("booksLoaded"));
-});
+}
+
+loadBooks();
