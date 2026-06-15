@@ -3,9 +3,9 @@
    Render thư viện, filter, search
    =================================================== */
 
-const SB_URL  = "https://dklfwlgpomnrmxmbjpat.supabase.co";
-const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrbGZ3bGdwb21ucm14bWJqcGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDQ5MDAsImV4cCI6MjA5NDA4MDkwMH0.sy8zDIdh9RBhl9TOqg6PnfTehqtV7VcFQSaSPoc4MoI";
-const H = { apikey: SB_ANON, Authorization: `Bearer ${SB_ANON}` };
+const _LIB_URL  = "https://dklfwlgpomnrmxmbjpat.supabase.co";
+const _LIB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrbGZ3bGdwb21ucm14bWJqcGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDQ5MDAsImV4cCI6MjA5NDA4MDkwMH0.sy8zDIdh9RBhl9TOqg6PnfTehqtV7VcFQSaSPoc4MoI";
+const _LIB_H = { apikey: _LIB_ANON, Authorization: `Bearer ${_LIB_ANON}` };
 
 let allBooksData   = [];  // raw from Supabase
 let currentFilter  = "all";
@@ -46,7 +46,7 @@ let currentSearch  = "";
 })();
 
 async function sbFetch(table, params = "") {
-  const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, { headers: H });
+  const r = await fetch(`${_LIB_URL}/rest/v1/${table}?${params}`, { headers: _LIB_H });
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
