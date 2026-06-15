@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap');
+
+/* ===================================================
+   BASE — Design tokens, reset, body, app shell
+   =================================================== */
+
+:root {
+  --font: 'Be Vietnam Pro', system-ui, sans-serif;
+
+  /* Paper light mode */
+  --bg:           #f5f2ed;
+  --bg-alt:       #ede9e2;
+  --surface:      #fdfcfa;
+  --surface-2:    #f7f5f1;
+  --border:       #e0dbd2;
+  --border-strong:#c8c2b8;
+
+  --text:         #1a1814;
+  --text-2:       #504c45;
+  --text-3:       #8a857d;
+
+  /* Forest green accent */
+  --accent:       #1e5c3d;
+  --accent-mid:   #2d7a54;
+  --accent-soft:  #d6ede3;
+  --accent-text:  #ffffff;
+  --accent-hover: #174d33;
+
+  /* Status colors */
+  --green-bg:   #d6ede3;  --green-fg:   #1a5236;
+  --amber-bg:   #fef3cd;  --amber-fg:   #7a5c00;
+  --red-bg:     #fde8e8;  --red-fg:     #9b1c1c;
+  --blue-bg:    #e0effe;  --blue-fg:    #1a4276;
+
+  /* Shadows */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.06);
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md:  0 2px 8px rgba(0,0,0,0.07), 0 6px 20px rgba(0,0,0,0.06);
+  --shadow-lg:  0 4px 16px rgba(0,0,0,0.09), 0 12px 36px rgba(0,0,0,0.09);
+
+  /* Border radius */
+  --radius-xs:  6px;
+  --radius-sm:  10px;
+  --radius-md:  14px;
+  --radius-lg:  18px;
+  --radius-xl:  24px;
+
+  /* Layout */
+  --sidebar-w: 260px;
+  --topbar-h:  64px;
+
+  /* Aliases */
+  --nav-btn-bg:   transparent;
+  --hover:        var(--bg-alt);
+  --text-muted:   var(--text-3);
+  --input-border: var(--border);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] {
+  --bg:           #111009;
+  --bg-alt:       #191714;
+  --surface:      #1e1c18;
+  --surface-2:    #252320;
+  --border:       #2e2b25;
+  --border-strong:#42403a;
+
+  --text:         #f0ece5;
+  --text-2:       #a09890;
+  --text-3:       #64605a;
+
+  --accent:       #3dd68c;
+  --accent-mid:   #4ade80;
+  --accent-soft:  #0b2419;
+  --accent-text:  #071a0f;
+  --accent-hover: #52e89e;
+
+  --green-bg:   #0b2419;  --green-fg:   #3dd68c;
+  --amber-bg:   #221800;  --amber-fg:   #fbbf24;
+  --red-bg:     #220d0d;  --red-fg:     #f87171;
+  --blue-bg:    #0d1c30;  --blue-fg:    #60a5fa;
+
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md:  0 2px 8px rgba(0,0,0,0.35), 0 6px 20px rgba(0,0,0,0.3);
+  --shadow-lg:  0 4px 16px rgba(0,0,0,0.45), 0 12px 36px rgba(0,0,0,0.4);
+
+  --hover:        var(--bg-alt);
+  --input-border: var(--border);
+}
+
+/* ===== Reset ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ===== App shell (sidebar + main grid) ===== */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100dvh;
+}
+
+/* ===== Reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
