@@ -15,7 +15,7 @@
     <h1 id="bookTitle">Đang tải...</h1>
     <p id="bookProgress"></p>
 
-    <div class="filter-bar">
+    <div class="filter-bar" id="filterBar">
       <button class="filter-btn active" onclick="setFilter('all', this)">
         Tất cả <span id="countAll" class="filter-count">0</span>
       </button>
@@ -26,6 +26,11 @@
         ✗ Chưa có <span id="countMissing" class="filter-count missing">0</span>
       </button>
     </div>
+
+    <!-- Nút thêm tập: chỉ hiện với admin/editor -->
+    <button class="btn-primary detail-add-btn" id="addVolBtn" style="display:none; margin-top:14px;" onclick="openAddVolSheet()">
+      ＋ Thêm / quản lý tập
+    </button>
   </div>
 
   <section class="detail-grid" id="volumesGrid"></section>
@@ -43,6 +48,215 @@
   <button class="lightbox-next" onclick="lightboxNext(event)">›</button>
 </div>
 
+<!-- ===== BOTTOM SHEET: Thêm / quản lý tập ===== -->
+<div class="sheet-backdrop" id="sheetBackdrop" onclick="closeAddVolSheet()"></div>
+<div class="bottom-sheet" id="bottomSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div>
+      <div class="sheet-title">Quản lý tập</div>
+      <div class="sheet-sub" id="sheetSub"></div>
+    </div>
+    <button class="sheet-close" onclick="closeAddVolSheet()">✕</button>
+  </div>
+
+  <div class="sheet-msg" id="sheetMsg"></div>
+
+  <!-- Form thêm tập -->
+  <div class="sheet-section-label">Thêm tập mới</div>
+  <div class="sheet-add-row">
+    <div class="sheet-field">
+      <label>Số tập</label>
+      <input type="number" id="sheetVolNum" min="1" value="1" inputmode="numeric">
+    </div>
+    <div class="sheet-field sheet-field-cover">
+      <label>URL bìa (tùy chọn)</label>
+      <input type="text" id="sheetVolCover" placeholder="https://...">
+    </div>
+  </div>
+  <button class="btn-primary sheet-add-btn" onclick="sheetAddVolume()">＋ Thêm tập</button>
+
+  <div class="sheet-section-label" style="margin-top:20px">Tập hiện có — nhấn để đổi trạng thái</div>
+  <div class="sheet-vol-tip">Nhấn = đổi sở hữu · Giữ / nút ✕ = xóa tập</div>
+  <div class="vol-grid" id="sheetVolGrid" style="margin-bottom:24px"></div>
+</div>
+
+<style>
+/* ── Bottom sheet ── */
+.sheet-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 400;
+  backdrop-filter: blur(2px);
+}
+.sheet-backdrop.open { display: block; }
+
+.bottom-sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  z-index: 500;
+  padding: 0 20px 32px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(.32,1,.42,1);
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+}
+.bottom-sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 4px;
+  margin: 14px auto 6px;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.sheet-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.sheet-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.sheet-close {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sheet-msg {
+  display: none;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.sheet-msg.error   { background: var(--red-bg);   color: var(--red-fg);   display: block; }
+.sheet-msg.success { background: var(--green-bg); color: var(--green-fg); display: block; }
+
+.sheet-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+
+.sheet-add-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.sheet-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sheet-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.sheet-field input {
+  padding: 11px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  font-family: var(--font);
+  transition: border-color 0.2s;
+}
+.sheet-field input:focus { border-color: var(--accent); }
+.sheet-field:first-child { width: 90px; flex-shrink: 0; }
+.sheet-field-cover       { flex: 1; }
+
+.sheet-add-btn {
+  width: 100%;
+  padding: 13px;
+  font-size: 15px;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.sheet-vol-tip {
+  font-size: 12px;
+  color: var(--text-3);
+  background: var(--bg-alt);
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  margin-bottom: 12px;
+}
+
+/* Mobile: vol-del-btn luôn hiện */
+@media (max-width: 768px) {
+  .vol-del-btn { display: flex !important; }
+  .vol-item    { padding: 8px 6px; }
+  .vol-cover-mini { width: 52px; height: 72px; }
+  .vol-num     { font-size: 12px; }
+  .vol-grid    { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; }
+
+  /* Modal form: 1 cột */
+  .form-grid { grid-template-columns: 1fr; }
+  .form-full  { grid-column: unset; }
+  .modal      { padding: 20px 16px; border-radius: 20px 20px 0 0; }
+  .modal-footer .btn-primary,
+  .modal-footer .btn-cancel { flex: 1; justify-content: center; }
+
+  .admin-toolbar .btn-primary { justify-content: center; }
+}
+
+/* Desktop: bottom sheet → hiển thị như modal giữa màn hình */
+@media (min-width: 769px) {
+  .sheet-backdrop { backdrop-filter: blur(2px); }
+  .bottom-sheet {
+    bottom: unset; left: 50%; top: 50%;
+    transform: translate(-50%, -40%);
+    width: 100%;
+    max-width: 560px;
+    border-radius: 20px;
+    max-height: 88vh;
+    transition: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .bottom-sheet.open {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(.34,1.3,.64,1);
+  }
+  .sheet-handle { display: none; }
+}
+</style>
+
 <script>
 /* ===== Dark mode sync ===== */
 (function() {
@@ -53,10 +267,23 @@
 /* ===== Auth guard ===== */
 const session = JSON.parse(sessionStorage.getItem('admin_user') || 'null');
 if (!session) { window.location.href = 'login.html'; }
+
+const isAdmin = session && (session.role === 'superadmin' || session.role === 'editor');
 </script>
 
 <script src="data/books.js"></script>
 <script>
+/* ===== Supabase ===== */
+const _SB2_URL  = "https://dklfwlgpomnrmxmbjpat.supabase.co";
+const _SB2_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrbGZ3bGdwb21ucm14bWJqcGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDQ5MDAsImV4cCI6MjA5NDA4MDkwMH0.sy8zDIdh9RBhl9TOqg6PnfTehqtV7VcFQSaSPoc4MoI";
+const _H2 = { apikey: _SB2_ANON, Authorization: `Bearer ${_SB2_ANON}`, 'Content-Type': 'application/json' };
+
+async function sbGet2(t, p='') { const r = await fetch(`${_SB2_URL}/rest/v1/${t}?${p}`, { headers: _H2 }); if (!r.ok) throw new Error(await r.text()); return r.json(); }
+async function sbPost2(t, b) { const r = await fetch(`${_SB2_URL}/rest/v1/${t}`, { method:'POST', headers:{..._H2, Prefer:'return=representation'}, body:JSON.stringify(b) }); if (!r.ok) throw new Error(await r.text()); return r.json(); }
+async function sbPatch2(t, f, b) { const r = await fetch(`${_SB2_URL}/rest/v1/${t}?${f}`, { method:'PATCH', headers:{..._H2, Prefer:'return=minimal'}, body:JSON.stringify(b) }); if (!r.ok) throw new Error(await r.text()); }
+async function sbDelete2(t, f) { const r = await fetch(`${_SB2_URL}/rest/v1/${t}?${f}`, { method:'DELETE', headers:_H2 }); if (!r.ok) throw new Error(await r.text()); }
+
+/* ===== State ===== */
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get("id");
 
@@ -64,24 +291,37 @@ const titleEl    = document.getElementById("bookTitle");
 const progressEl = document.getElementById("bookProgress");
 const gridEl     = document.getElementById("volumesGrid");
 
-let currentBook = null;
-let currentFilter = "all";
+let currentBook     = null;
+let currentFilter   = "all";
 let filteredVolumes = [];
-let lightboxIndex = 0;
+let lightboxIndex   = 0;
 
+/* ===== Load & render ===== */
 window.addEventListener("booksLoaded", () => {
   const book = books.find(b => b.id === bookId);
-  if (!book) {
-    titleEl.innerText = "Không tìm thấy bộ truyện";
-    return;
-  }
+  if (!book) { titleEl.innerText = "Không tìm thấy bộ truyện"; return; }
   currentBook = book;
   document.title = book.title + " — Kho Sách";
   titleEl.innerText = book.title;
-  progressEl.innerText = `${book.owned}/${book.total} tập`;
+  updateProgress(book);
   updateCounts(book);
   renderVolumes(book);
+
+  if (isAdmin) {
+    document.getElementById("addVolBtn").style.display = "";
+  }
+
+  /* Áp filter từ URL nếu có */
+  const urlFilter = params.get("filter");
+  if (urlFilter === "missing") {
+    const btn = document.querySelector('.filter-btn:nth-child(3)');
+    if (btn) setFilter("missing", btn);
+  }
 });
+
+function updateProgress(book) {
+  progressEl.innerText = `${book.owned}/${book.total} tập`;
+}
 
 function updateCounts(book) {
   const owned   = book.volumes.filter(v => v.owned).length;
@@ -106,7 +346,7 @@ function renderVolumes(book) {
     return true;
   });
 
-  if (filteredVolumes.length === 0) {
+  if (!filteredVolumes.length) {
     gridEl.innerHTML = `<p class="empty-msg">Không có tập nào.</p>`;
     return;
   }
@@ -135,12 +375,10 @@ function openLightbox(idx) {
   document.getElementById("lightbox").classList.add("active");
   document.body.style.overflow = "hidden";
 }
-
 function closeLightbox() {
   document.getElementById("lightbox").classList.remove("active");
   document.body.style.overflow = "";
 }
-
 function showLightboxAt(idx) {
   const volume = filteredVolumes[idx];
   document.getElementById("lightboxImg").src = volume.cover;
@@ -148,17 +386,8 @@ function showLightboxAt(idx) {
   document.querySelector(".lightbox-prev").style.visibility = idx === 0 ? "hidden" : "visible";
   document.querySelector(".lightbox-next").style.visibility = idx === filteredVolumes.length - 1 ? "hidden" : "visible";
 }
-
-function lightboxPrev(e) {
-  e.stopPropagation();
-  if (lightboxIndex > 0) showLightboxAt(--lightboxIndex);
-}
-
-function lightboxNext(e) {
-  e.stopPropagation();
-  if (lightboxIndex < filteredVolumes.length - 1) showLightboxAt(++lightboxIndex);
-}
-
+function lightboxPrev(e) { e.stopPropagation(); if (lightboxIndex > 0) showLightboxAt(--lightboxIndex); }
+function lightboxNext(e) { e.stopPropagation(); if (lightboxIndex < filteredVolumes.length - 1) showLightboxAt(++lightboxIndex); }
 document.addEventListener("keydown", e => {
   const lb = document.getElementById("lightbox");
   if (!lb.classList.contains("active")) return;
@@ -168,6 +397,122 @@ document.addEventListener("keydown", e => {
 });
 
 function goBack() { window.history.back(); }
+
+/* ===== Bottom Sheet: thêm/quản lý tập ===== */
+function openAddVolSheet() {
+  if (!currentBook) return;
+  document.getElementById("sheetSub").textContent = currentBook.title + " · " + currentBook.volumes.length + " tập";
+  document.getElementById("sheetVolNum").value = nextVolNum();
+  document.getElementById("sheetVolCover").value = "";
+  document.getElementById("sheetMsg").className = "sheet-msg";
+  renderSheetVolGrid();
+  document.getElementById("sheetBackdrop").classList.add("open");
+  document.getElementById("bottomSheet").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAddVolSheet() {
+  document.getElementById("sheetBackdrop").classList.remove("open");
+  document.getElementById("bottomSheet").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function nextVolNum() {
+  const vols = currentBook.volumes;
+  return vols.length ? Math.max(...vols.map(v => v.number)) + 1 : 1;
+}
+
+function renderSheetVolGrid() {
+  const vols = [...currentBook.volumes].sort((a, b) => a.number - b.number);
+  const grid = document.getElementById("sheetVolGrid");
+  if (!vols.length) {
+    grid.innerHTML = '<div style="color:var(--text-3);font-size:14px;grid-column:1/-1;text-align:center;padding:16px 0">Chưa có tập nào.</div>';
+    return;
+  }
+  grid.innerHTML = vols.map(v => `
+    <div class="vol-item ${v.owned ? 'owned' : ''}" onclick="sheetToggleOwned(${v.id}, ${v.owned})" title="Tập ${v.number}">
+      <button class="vol-del-btn" onclick="event.stopPropagation(); sheetDeleteVol(${v.id})">✕</button>
+      ${v.cover
+        ? `<img class="vol-cover-mini" src="${esc(v.cover)}" onerror="this.style.display='none'">`
+        : `<div style="width:48px;height:66px;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:4px;background:var(--bg-alt)">📖</div>`}
+      <div class="vol-num">Tập ${v.number}</div>
+      ${v.owned ? '<div class="vol-owned-dot"></div>' : ''}
+    </div>
+  `).join('');
+}
+
+async function sheetAddVolume() {
+  const num   = parseInt(document.getElementById("sheetVolNum").value);
+  const cover = document.getElementById("sheetVolCover").value.trim() || null;
+  const msgEl = document.getElementById("sheetMsg");
+  msgEl.className = "sheet-msg";
+
+  if (!num || num < 1) { msgEl.textContent = "Số tập không hợp lệ."; msgEl.className = "sheet-msg error"; return; }
+  if (currentBook.volumes.find(v => v.number === num)) {
+    msgEl.textContent = `Tập ${num} đã tồn tại.`; msgEl.className = "sheet-msg error"; return;
+  }
+
+  const btn = document.querySelector(".sheet-add-btn");
+  btn.disabled = true; btn.textContent = "Đang thêm...";
+
+  try {
+    const res = await sbPost2("volumes", { book_id: bookId, number: num, owned: false, cover });
+    currentBook.volumes.push(res[0]);
+    currentBook.total = currentBook.volumes.length;
+    document.getElementById("sheetVolNum").value = nextVolNum();
+    document.getElementById("sheetVolCover").value = "";
+    updateProgress(currentBook);
+    updateCounts(currentBook);
+    renderVolumes(currentBook);
+    renderSheetVolGrid();
+    document.getElementById("sheetSub").textContent = currentBook.title + " · " + currentBook.volumes.length + " tập";
+    msgEl.textContent = `Đã thêm tập ${num} ✓`; msgEl.className = "sheet-msg success";
+    setTimeout(() => { msgEl.className = "sheet-msg"; }, 2500);
+  } catch(e) {
+    msgEl.textContent = "Lỗi: " + e.message; msgEl.className = "sheet-msg error";
+  } finally {
+    btn.disabled = false; btn.innerHTML = "＋ Thêm tập";
+  }
+}
+
+async function sheetToggleOwned(volId, currentOwned) {
+  try {
+    await sbPatch2("volumes", `id=eq.${volId}`, { owned: !currentOwned });
+    const v = currentBook.volumes.find(x => x.id === volId);
+    if (v) {
+      v.owned = !currentOwned;
+      currentBook.owned = currentBook.volumes.filter(x => x.owned).length;
+    }
+    updateProgress(currentBook);
+    updateCounts(currentBook);
+    renderVolumes(currentBook);
+    renderSheetVolGrid();
+  } catch(e) {
+    const msgEl = document.getElementById("sheetMsg");
+    msgEl.textContent = "Lỗi: " + e.message; msgEl.className = "sheet-msg error";
+  }
+}
+
+async function sheetDeleteVol(volId) {
+  const msgEl = document.getElementById("sheetMsg");
+  try {
+    await sbDelete2("volumes", `id=eq.${volId}`);
+    currentBook.volumes = currentBook.volumes.filter(x => x.id !== volId);
+    currentBook.total = currentBook.volumes.length;
+    currentBook.owned = currentBook.volumes.filter(v => v.owned).length;
+    updateProgress(currentBook);
+    updateCounts(currentBook);
+    renderVolumes(currentBook);
+    renderSheetVolGrid();
+    document.getElementById("sheetSub").textContent = currentBook.title + " · " + currentBook.volumes.length + " tập";
+  } catch(e) {
+    msgEl.textContent = "Lỗi xóa: " + e.message; msgEl.className = "sheet-msg error";
+  }
+}
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 </script>
 </body>
 </html>
