@@ -3,215 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập Admin</title>
+  <title>Đăng nhập — Kho Sách</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .login-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      padding: 20px;
-    }
-
-    .login-box {
-      background: var(--surface);
-      border-radius: 20px;
-      padding: 40px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: var(--card-shadow);
-    }
-
-    .login-logo {
-      text-align: center;
-      font-size: 40px;
-      margin-bottom: 8px;
-    }
-
-    .login-title {
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .login-subtitle {
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--input-border);
-      border-radius: 12px;
-      font-size: 15px;
-      background: var(--bg);
-      color: var(--text);
-      transition: border-color 0.2s, background 0.3s, color 0.3s;
-      outline: none;
-    }
-
-    .form-group input:focus {
-      border-color: var(--accent);
-    }
-
-    .form-group input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      color: var(--accent-text);
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      margin-top: 6px;
-    }
-
-    .login-btn:hover { opacity: 0.9; }
-    .login-btn:active { transform: scale(0.99); }
-    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .login-error {
-      background: #fde8e8;
-      color: #c0392b;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      margin-top: 14px;
-      display: none;
-    }
-    [data-theme="dark"] .login-error { background: #3a1a1a; color: #f87171; }
-
-    .login-success {
-      background: #d4edda;
-      color: #1a7a3a;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      margin-top: 14px;
-      display: none;
-    }
-    [data-theme="dark"] .login-success { background: #1a3a2a; color: #4ade80; }
-
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .back-link:hover { color: var(--accent); }
-
-    .role-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .role-superadmin { background: #fde8e8; color: #c0392b; }
-    .role-editor     { background: #e8f4fd; color: #2471a3; }
-    [data-theme="dark"] .role-superadmin { background: #3a1a1a; color: #f87171; }
-    [data-theme="dark"] .role-editor     { background: #1a2a3a; color: #60a5fa; }
-
-    .user-info {
-      margin-top: 20px;
-      padding: 16px;
-      background: var(--nav-btn-bg);
-      border-radius: 12px;
-      display: none;
-    }
-
-    .user-info-name {
-      font-weight: bold;
-      font-size: 15px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .user-info-meta {
-      font-size: 13px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
 </head>
 <body>
 
 <div class="login-page">
-  <div class="login-box">
-    <div class="login-logo">📚</div>
-    <div class="login-title">Kho Sách — Admin</div>
-    <div class="login-subtitle">Đăng nhập để quản lý bộ sưu tập</div>
+  <div class="login-wrap">
 
-    <div class="form-group">
-      <label for="username">Tên đăng nhập</label>
-      <input type="text" id="username" placeholder="Nhập username..." autocomplete="username">
-    </div>
-
-    <div class="form-group">
-      <label for="password">Mật khẩu</label>
-      <input type="password" id="password" placeholder="Nhập mật khẩu..." autocomplete="current-password">
-    </div>
-
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">Đăng nhập</button>
-
-    <div class="login-error" id="loginError"></div>
-    <div class="login-success" id="loginSuccess"></div>
-
-    <div class="user-info" id="userInfo">
-      <div class="user-info-name" id="userInfoName"></div>
-      <div class="user-info-meta">
-        <span id="userInfoRole"></span>
-        <span>·</span>
-        <span id="userInfoUsername"></span>
+    <!-- Left panel -->
+    <div class="login-aside">
+      <div>
+        <div class="login-aside-logo">📚</div>
+        <div class="login-aside-title">Kho Sách</div>
+        <div class="login-aside-sub">Quản lý bộ sưu tập manga của bạn — theo dõi tập, wishlist, và tiến độ sưu tầm.</div>
+        <div class="login-aside-decor">
+          <span></span><span></span><span></span>
+        </div>
       </div>
+      <div class="login-aside-footer">Chỉ dành cho quản trị viên có tài khoản.</div>
     </div>
 
-    <a href="index.html" class="back-link">← Quay lại trang chủ</a>
+    <!-- Right panel: form -->
+    <div class="login-form-area">
+      <div class="login-form-title">Đăng nhập</div>
+      <div class="login-form-sub">Nhập thông tin tài khoản của bạn</div>
+
+      <div class="login-group">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" id="username" placeholder="username..." autocomplete="username">
+      </div>
+
+      <div class="login-group">
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" placeholder="mật khẩu..." autocomplete="current-password">
+      </div>
+
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">Đăng nhập</button>
+
+      <div class="login-error" id="loginError"></div>
+      <div class="login-success" id="loginSuccess"></div>
+
+      <div class="login-user-info" id="userInfo">
+        <div class="login-user-name" id="userInfoName"></div>
+        <div class="login-user-meta">
+          <span id="userInfoRole"></span>
+          <span>·</span>
+          <span id="userInfoUsername"></span>
+        </div>
+      </div>
+
+      <a href="index.html" class="login-back">← Quay lại trang chủ</a>
+    </div>
+
   </div>
 </div>
 
@@ -237,92 +81,58 @@ async function doLogin() {
   const btn = document.getElementById('loginBtn');
   const errorEl = document.getElementById('loginError');
   const successEl = document.getElementById('loginSuccess');
-  const userInfoEl = document.getElementById('userInfo');
 
   errorEl.style.display = 'none';
   successEl.style.display = 'none';
-  userInfoEl.style.display = 'none';
+  document.getElementById('userInfo').style.display = 'none';
 
   if (!username || !password) {
     errorEl.textContent = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.';
-    errorEl.style.display = 'block';
-    return;
+    errorEl.style.display = 'block'; return;
   }
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Đang xác thực...';
+  btn.innerHTML = '<span class="login-spinner"></span>Đang xác thực...';
 
   try {
     const passwordHash = await sha256(password);
-
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/admin_users?username=eq.${encodeURIComponent(username)}&select=*`,
-      {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      }
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
     );
-
     if (!res.ok) throw new Error('Lỗi kết nối đến máy chủ.');
-
     const data = await res.json();
-
     if (!data || data.length === 0) {
       errorEl.textContent = 'Tên đăng nhập không tồn tại.';
-      errorEl.style.display = 'block';
-      return;
+      errorEl.style.display = 'block'; return;
     }
-
     const user = data[0];
-
     if (user.password_hash !== passwordHash) {
       errorEl.textContent = 'Mật khẩu không đúng.';
-      errorEl.style.display = 'block';
-      return;
+      errorEl.style.display = 'block'; return;
     }
 
-    // Cập nhật last_login
-    fetch(
-      `${SUPABASE_URL}/rest/v1/admin_users?id=eq.${user.id}`,
-      {
-        method: 'PATCH',
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal'
-        },
-        body: JSON.stringify({ last_login: new Date().toISOString() })
-      }
-    ).catch(() => {});
+    fetch(`${SUPABASE_URL}/rest/v1/admin_users?id=eq.${user.id}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ last_login: new Date().toISOString() })
+    }).catch(() => {});
 
-    // Lưu session
     sessionStorage.setItem('admin_user', JSON.stringify({
-      id: user.id,
-      username: user.username,
-      display_name: user.display_name,
-      role: user.role
+      id: user.id, username: user.username, display_name: user.display_name, role: user.role
     }));
 
-    // Hiện thông tin
-    successEl.textContent = `Đăng nhập thành công! Xin chào, ${user.display_name || user.username}.`;
+    successEl.textContent = `Xin chào, ${user.display_name || user.username}! Đang chuyển hướng...`;
     successEl.style.display = 'block';
 
     document.getElementById('userInfoName').textContent = user.display_name || user.username;
     document.getElementById('userInfoUsername').textContent = '@' + user.username;
-
     const roleEl = document.getElementById('userInfoRole');
     roleEl.className = 'role-badge role-' + user.role;
     roleEl.textContent = user.role === 'superadmin' ? 'Super Admin' : 'Editor';
+    document.getElementById('userInfo').style.display = 'block';
 
-    userInfoEl.style.display = 'block';
-
-    // Chuyển trang sau 1.5s (thay index.html bằng trang admin nếu có)
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 1500);
+    setTimeout(() => { window.location.href = 'index.html'; }, 1400);
 
   } catch (err) {
     errorEl.textContent = err.message || 'Đã xảy ra lỗi. Vui lòng thử lại.';
@@ -333,10 +143,7 @@ async function doLogin() {
   }
 }
 
-// Enter để submit
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 </script>
 </body>
 </html>
