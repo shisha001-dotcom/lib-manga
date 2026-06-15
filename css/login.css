@@ -1,0 +1,204 @@
+/* ===================================================
+   LOGIN — split-panel login page
+   Dùng cho: login.html
+   =================================================== */
+
+.login-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.login-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  width: 100%;
+  max-width: 820px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+/* ── Left accent panel ── */
+.login-aside {
+  background: var(--accent);
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 480px;
+}
+
+.login-aside-logo  { font-size: 32px; margin-bottom: 16px; }
+
+.login-aside-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent-text);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.login-aside-sub {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+}
+
+.login-aside-footer {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 40px;
+}
+
+.login-aside-decor {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.login-aside-decor span {
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.25);
+}
+.login-aside-decor span:first-child { background: rgba(255,255,255,0.7); }
+
+/* ── Right form panel ── */
+.login-form-area {
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-form-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin-bottom: 4px;
+}
+
+.login-form-sub {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 28px;
+}
+
+/* ── Form fields ── */
+.login-group { margin-bottom: 16px; }
+
+.login-group label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+
+.login-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.login-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.login-group input::placeholder { color: var(--text-3); }
+
+/* ── Submit button ── */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 8px;
+}
+.login-btn:hover    { opacity: 0.9; }
+.login-btn:active   { transform: scale(0.99); }
+.login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Feedback messages ── */
+.login-error,
+.login-success {
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-top: 14px;
+  display: none;
+  font-weight: 500;
+}
+.login-error   { background: var(--red-bg);   color: var(--red-fg);   }
+.login-success { background: var(--green-bg); color: var(--green-fg); }
+
+/* ── Back link ── */
+.login-back {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.login-back:hover { color: var(--accent); }
+
+/* ── User info card (after login) ── */
+.login-user-info {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--bg-alt);
+  border-radius: var(--radius-sm);
+  display: none;
+  border: 1px solid var(--border);
+}
+.login-user-name { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+.login-user-meta { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 8px; }
+
+/* ── Role badges ── */
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.role-superadmin { background: var(--red-bg);  color: var(--red-fg);  }
+.role-editor     { background: var(--blue-bg); color: var(--blue-fg); }
+
+/* ── Login spinner ── */
+.login-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rot 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}

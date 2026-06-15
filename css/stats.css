@@ -1,0 +1,209 @@
+/* ===================================================
+   STATS — stat cards, shelf bar chart, missing list
+   Dùng cho: stats.html
+   =================================================== */
+
+.stats-main {
+  min-width: 0;
+  padding: 28px 32px 64px;
+}
+
+/* ── Stat summary cards ── */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 20px 22px 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-card .stat-icon  { font-size: 22px; margin-bottom: 6px; }
+.stat-card .stat-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.stat-card .stat-label {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── Section headers (stats page) ── */
+.shelf-section,
+.missing-section {
+  margin-bottom: 36px;
+}
+
+.section-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Shelf bar chart ── */
+.shelf-chart {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.shelf-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shelf-label {
+  width: 128px;
+  font-size: 13px;
+  color: var(--text-2);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.shelf-bar-wrap {
+  flex: 1;
+  background: var(--bg-alt);
+  border-radius: 6px;
+  height: 18px;
+  overflow: hidden;
+}
+
+.shelf-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.9s cubic-bezier(.34,1.2,.64,1);
+  min-width: 4px;
+}
+.shelf-bar-fill.reading  { background: #3b82f6; }
+.shelf-bar-fill.next     { background: #f59e0b; }
+.shelf-bar-fill.finished { background: var(--accent); }
+
+.shelf-stat {
+  width: 88px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/* ── Missing volumes list ── */
+.missing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.missing-item {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+.missing-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+}
+
+.missing-cover {
+  width: 42px;
+  height: 58px;
+  border-radius: var(--radius-xs);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg-alt);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.missing-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.missing-title {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.missing-bar-wrap {
+  background: var(--bg-alt);
+  border-radius: 4px;
+  height: 5px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+.missing-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.missing-sub {
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.missing-badge {
+  background: var(--red-bg);
+  color: var(--red-fg);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.all-complete {
+  color: var(--text-3);
+  font-size: 14px;
+  padding: 24px 0;
+  text-align: center;
+}

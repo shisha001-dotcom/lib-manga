@@ -1,0 +1,54 @@
+/* ===================================================
+   RESPONSIVE — tất cả breakpoints tập trung ở đây
+   Breakpoint chính: 768px (mobile)
+   =================================================== */
+
+@media (max-width: 768px) {
+
+  /* ── App shell ── */
+  .app { grid-template-columns: 1fr; }
+
+  /* ── Sidebar: slide-in drawer ── */
+  .hamburger { display: flex; }
+
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100dvh;
+    z-index: 200;
+    transform: translateX(-100%);
+    box-shadow: 6px 0 32px rgba(0,0,0,0.25);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  /* ── Page padding (account for hamburger) ── */
+  .main-content { padding: 20px 16px 40px; padding-top: 72px; }
+  .detail-page  { padding: 72px 16px 48px; }
+  .stats-main   { padding: 20px 16px 48px; padding-top: 72px; }
+
+  /* ── Book grids ── */
+  .book-grid   { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+  .detail-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+
+  /* ── Topbar ── */
+  .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  #searchInput { width: 100%; max-width: none; }
+
+  /* ── Stats shelf chart ── */
+  .shelf-label { width: 100px; font-size: 12px; }
+  .shelf-stat  { width: 72px;  font-size: 11px; }
+
+  /* ── Admin toolbar ── */
+  .admin-toolbar { flex-direction: column; }
+  .search-box,
+  .filter-select,
+  .admin-toolbar .btn-primary { width: 100%; }
+
+  /* ── Stats summary cards: 2 cột ── */
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
+
+  /* ── Login: ẩn panel trái, chỉ hiện form ── */
+  .login-wrap        { grid-template-columns: 1fr; }
+  .login-aside       { display: none; }
+  .login-form-area   { padding: 36px 28px; }
+}
