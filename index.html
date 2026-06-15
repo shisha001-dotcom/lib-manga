@@ -110,9 +110,9 @@
       <input class="search-box" type="text" id="adminSearch" placeholder="🔍 Tìm theo tên..." oninput="renderAdminTable()">
       <select class="filter-select" id="adminShelfFilter" onchange="renderAdminTable()">
         <option value="">Tất cả kệ</option>
-        <option value="reading">📖 Đang đọc</option>
-        <option value="next">🔜 Sắp đọc</option>
-        <option value="finished">✅ Đã xong</option>
+        <option value="reading">📖 Chưa đủ bộ</option>
+        <option value="next">🕒 Wishlist</option>
+        <option value="finished">✅ Hoàn thành</option>
       </select>
       <button class="btn-primary" onclick="openBookEditModal()">＋ Thêm bộ truyện</button>
     </div>
@@ -161,9 +161,9 @@
       <div class="form-group-m">
         <label>Kệ sách <span style="color:var(--red-fg)">*</span></label>
         <select id="fShelf">
-          <option value="reading">📖 Đang đọc</option>
-          <option value="next">🔜 Sắp đọc</option>
-          <option value="finished">✅ Đã xong</option>
+          <option value="reading">📖 Chưa đủ bộ</option>
+          <option value="next">🕒 Wishlist</option>
+          <option value="finished">✅ Hoàn thành</option>
         </select>
       </div>
       <div class="form-group-m form-full">
@@ -368,7 +368,7 @@ function renderAdminTable() {
 }
 
 function shelfBadgeHtml(shelf) {
-  const map = { reading: ['shelf-reading','📖 Đang đọc'], next: ['shelf-next','🔜 Sắp đọc'], finished: ['shelf-finished','✅ Đã xong'] };
+  const map = { reading: ['shelf-reading','📖 Chưa đủ bộ'], next: ['shelf-next','🕒 Wishlist'], finished: ['shelf-finished','✅ Hoàn thành'] };
   const [cls, label] = map[shelf] || ['',''];
   return `<span class="shelf-badge ${cls}">${label}</span>`;
 }
@@ -465,7 +465,7 @@ function openVolumeModal(bookId) {
   currentVolBookId = bookId;
   const b = allBooks.find(x => x.id === bookId);
   document.getElementById('volBookTitle').textContent = b.title;
-  document.getElementById('volBookMeta').textContent = b.author + ' · ' + ({reading:'Đang đọc',next:'Sắp đọc',finished:'Đã xong'})[b.shelf];
+  document.getElementById('volBookMeta').textContent = b.author + ' · ' + ({reading:'Chưa đủ bộ',next:'Wishlist',finished:'Hoàn thành'})[b.shelf];
   document.getElementById('volModalMsg').className = 'modal-msg';
   document.getElementById('volNumInput').value = nextVolNum(bookId);
   document.getElementById('volCoverInput').value = '';
