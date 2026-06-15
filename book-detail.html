@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chi tiết bộ truyện</title>
+  <title>Chi tiết bộ truyện — Kho Sách</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="detail-page">
 
-  <header class="detail-header">
-    <button onclick="goBack()">← Quay lại</button>
-    <h1 id="bookTitle">Tên bộ truyện</h1>
-    <p id="bookProgress">0/0 tập</p>
+  <div class="detail-header">
+    <button class="back-btn" onclick="goBack()">← Quay lại</button>
+    <h1 id="bookTitle">Đang tải...</h1>
+    <p id="bookProgress"></p>
+
     <div class="filter-bar">
       <button class="filter-btn active" onclick="setFilter('all', this)">
         Tất cả <span id="countAll" class="filter-count">0</span>
@@ -25,7 +26,7 @@
         ✗ Chưa có <span id="countMissing" class="filter-count missing">0</span>
       </button>
     </div>
-  </header>
+  </div>
 
   <section class="detail-grid" id="volumesGrid"></section>
 
@@ -42,7 +43,6 @@
   <button class="lightbox-next" onclick="lightboxNext(event)">›</button>
 </div>
 
-<script src="data/books.js"></script>
 <script>
 /* ===== Dark mode sync ===== */
 (function() {
@@ -50,7 +50,13 @@
   if (saved) document.documentElement.setAttribute('data-theme', saved);
 })();
 
-/* ===== Book detail ===== */
+/* ===== Auth guard ===== */
+const session = JSON.parse(sessionStorage.getItem('admin_user') || 'null');
+if (!session) { window.location.href = 'login.html'; }
+</script>
+
+<script src="data/books.js"></script>
+<script>
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get("id");
 
@@ -65,9 +71,12 @@ let lightboxIndex = 0;
 
 window.addEventListener("booksLoaded", () => {
   const book = books.find(b => b.id === bookId);
-  if (!book) { titleEl.innerText = "Không tìm thấy bộ truyện"; return; }
-
+  if (!book) {
+    titleEl.innerText = "Không tìm thấy bộ truyện";
+    return;
+  }
   currentBook = book;
+  document.title = book.title + " — Kho Sách";
   titleEl.innerText = book.title;
   progressEl.innerText = `${book.owned}/${book.total} tập`;
   updateCounts(book);
@@ -91,7 +100,6 @@ function setFilter(filter, btn) {
 
 function renderVolumes(book) {
   gridEl.innerHTML = "";
-
   filteredVolumes = book.volumes.filter(v => {
     if (currentFilter === "owned")   return v.owned;
     if (currentFilter === "missing") return !v.owned;
@@ -106,7 +114,6 @@ function renderVolumes(book) {
   filteredVolumes.forEach((volume, idx) => {
     const card = document.createElement("div");
     card.className = "volume-card" + (volume.owned ? "" : " missing");
-
     card.innerHTML = `
       <div class="volume-cover" style="background-image:url('${volume.cover}')">
         ${volume.owned
@@ -116,7 +123,6 @@ function renderVolumes(book) {
       </div>
       <div class="volume-number">Tập ${volume.number}</div>
     `;
-
     card.querySelector(".volume-cover").addEventListener("click", () => openLightbox(idx));
     gridEl.appendChild(card);
   });
@@ -138,8 +144,7 @@ function closeLightbox() {
 function showLightboxAt(idx) {
   const volume = filteredVolumes[idx];
   document.getElementById("lightboxImg").src = volume.cover;
-  document.getElementById("lightboxCaption").textContent =
-    `${currentBook.title} — Tập ${volume.number}`;
+  document.getElementById("lightboxCaption").textContent = `${currentBook.title} — Tập ${volume.number}`;
   document.querySelector(".lightbox-prev").style.visibility = idx === 0 ? "hidden" : "visible";
   document.querySelector(".lightbox-next").style.visibility = idx === filteredVolumes.length - 1 ? "hidden" : "visible";
 }
