@@ -1,6 +1,6 @@
 /* ===================================================
    KHO SÁCH — Main CSS Entry Point
-   
+
    Thứ tự import quan trọng:
    1. base        → tokens & reset (phải đứng đầu)
    2. sidebar     → navigation
@@ -9,8 +9,9 @@
    5. detail      → chi tiết bộ truyện (book-detail.html)
    6. stats       → thống kê (stats.html)
    7. admin       → panel quản lý (index + stats)
-   8. login       → trang đăng nhập (login.html)
-   9. responsive  → tất cả @media (phải đứng cuối)
+   8. vollist     → danh sách tập dùng chung
+   9. login       → trang đăng nhập (login.html)
+   10. responsive → tất cả @media (phải đứng cuối)
    =================================================== */
 
 @import url('css/base.css');
@@ -20,5 +21,6 @@
 @import url('css/detail.css');
 @import url('css/stats.css');
 @import url('css/admin.css');
+@import url('css/vollist.css');
 @import url('css/login.css');
 @import url('css/responsive.css');
