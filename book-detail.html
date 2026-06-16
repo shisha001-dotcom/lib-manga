@@ -5,6 +5,141 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chi tiết bộ truyện — Kho Sách</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+/* ── Vol-list (dạng hàng ngang) ── */
+.vol-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.vl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  transition: border-color 0.15s, background 0.15s;
+}
+.vl-row.owned {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.vl-cover-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 42px; height: 58px;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  user-select: none; -webkit-user-select: none;
+}
+.vl-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vl-cover-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.vl-owned-badge {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900;
+  color: var(--accent-text);
+  background: rgba(0,0,0,0);
+  transition: background 0.15s;
+  pointer-events: none;
+}
+.vl-row.owned .vl-owned-badge { background: color-mix(in srgb, var(--accent) 65%, transparent); }
+.vl-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.vl-num  { font-size: 13px; font-weight: 700; color: var(--text); }
+.vl-url-row { display: flex; gap: 6px; align-items: center; }
+.vl-url-input {
+  flex: 1; min-width: 0;
+  padding: 6px 10px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-xs);
+  font-size: 12px; background: var(--surface); color: var(--text);
+  outline: none; font-family: inherit; transition: border-color 0.15s;
+}
+.vl-url-input:focus { border-color: var(--accent); }
+.vl-save-btn {
+  flex-shrink: 0; padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  background: var(--accent); color: var(--accent-text);
+  border: none; font-size: 13px; cursor: pointer;
+  transition: opacity 0.15s; white-space: nowrap;
+}
+.vl-save-btn:hover   { opacity: 0.85; }
+.vl-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.vl-del-btn {
+  flex-shrink: 0; width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--red-bg); color: var(--red-fg);
+  border: none; font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.15s;
+}
+.vl-del-btn:hover { opacity: 0.75; }
+
+/* ── Bottom sheet ── */
+.sheet-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 400;
+  backdrop-filter: blur(2px);
+}
+.sheet-backdrop.open { display: block; }
+.bottom-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0; z-index: 500;
+  padding: 0 20px 32px;
+  max-height: 92dvh; overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(.32,1,.42,1);
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+}
+.bottom-sheet.open { transform: translateY(0); }
+.sheet-handle { width:40px;height:4px;background:var(--border);border-radius:4px;margin:14px auto 6px; }
+.sheet-header { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:16px; }
+.sheet-title  { font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.02em; }
+.sheet-sub    { font-size:12px;color:var(--text-3);margin-top:2px; }
+.sheet-close  { width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--bg-alt);font-size:13px;cursor:pointer;color:var(--text-2);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.sheet-msg    { display:none;padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px; }
+.sheet-msg.error   { background:var(--red-bg);  color:var(--red-fg);  display:block; }
+.sheet-msg.success { background:var(--green-bg);color:var(--green-fg);display:block; }
+.sheet-section-label { font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px; }
+.sheet-add-row  { display:flex;gap:10px;margin-bottom:10px; }
+.sheet-field    { display:flex;flex-direction:column;gap:5px; }
+.sheet-field label { font-size:12px;font-weight:600;color:var(--text-2); }
+.sheet-field input { padding:11px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;background:var(--bg);color:var(--text);outline:none;font-family:var(--font);transition:border-color 0.2s; }
+.sheet-field input:focus { border-color:var(--accent); }
+.sheet-field:first-child { width:90px;flex-shrink:0; }
+.sheet-field-cover { flex:1; }
+.sheet-add-btn  { width:100%;padding:13px;font-size:15px;justify-content:center;border-radius:var(--radius-sm); }
+.sheet-vol-tip  { font-size:12px;color:var(--text-3);background:var(--bg-alt);padding:8px 10px;border-radius:var(--radius-xs);margin-bottom:12px; }
+
+/* Desktop: sheet → modal */
+@media (min-width: 769px) {
+  .sheet-backdrop { backdrop-filter: blur(2px); }
+  .bottom-sheet {
+    bottom:unset;left:50%;top:50%;
+    transform:translate(-50%,-40%);
+    width:100%;max-width:580px;
+    border-radius:20px;max-height:88vh;
+    transition:none;opacity:0;pointer-events:none;
+  }
+  .bottom-sheet.open { transform:translate(-50%,-50%);opacity:1;pointer-events:auto;transition:opacity 0.2s,transform 0.25s cubic-bezier(.34,1.3,.64,1); }
+  .sheet-handle { display:none; }
+}
+
+@media (max-width: 480px) {
+  .vl-url-input { font-size: 13px; padding: 7px 8px; }
+  .vl-save-btn  { font-size: 14px; padding: 7px 10px; }
+}
+  </style>
 </head>
 <body>
 
@@ -26,7 +161,8 @@
       </button>
     </div>
 
-    <button class="btn-primary detail-add-btn" id="addVolBtn" style="display:none; margin-top:14px;" onclick="openAddVolSheet()">
+    <button class="btn-primary detail-add-btn" id="addVolBtn"
+      style="display:none; margin-top:14px;" onclick="openAddVolSheet()">
       ＋ Thêm / quản lý tập
     </button>
   </div>
@@ -45,7 +181,7 @@
   <button class="lightbox-next" onclick="lightboxNext(event)">›</button>
 </div>
 
-<!-- ===== BOTTOM SHEET ===== -->
+<!-- BOTTOM SHEET -->
 <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeAddVolSheet()"></div>
 <div class="bottom-sheet" id="bottomSheet">
   <div class="sheet-handle"></div>
@@ -72,227 +208,10 @@
   </div>
   <button class="btn-primary sheet-add-btn" onclick="sheetAddVolume()">＋ Thêm tập</button>
 
-  <div class="sheet-section-label" style="margin-top:20px">
-    Tập hiện có
-  </div>
-  <div class="sheet-vol-tip">
-    Nhấn = đổi sở hữu &nbsp;·&nbsp; Giữ 1s = sửa bìa &nbsp;·&nbsp; ✕ = xóa tập
-  </div>
-  <div class="vol-grid" id="sheetVolGrid" style="margin-bottom:24px"></div>
+  <div class="sheet-section-label" style="margin-top:20px">Tập hiện có</div>
+  <div class="sheet-vol-tip">Nhấn bìa = đổi sở hữu &nbsp;·&nbsp; Sửa URL rồi 💾 = cập nhật bìa &nbsp;·&nbsp; ✕ = xóa tập</div>
+  <div class="vol-list" id="sheetVolList"></div>
 </div>
-
-<!-- ===== COVER EDIT POPOVER ===== -->
-<div class="cover-popover-backdrop" id="coverPopoverBackdrop" onclick="closeCoverPopover()"></div>
-<div class="cover-popover" id="coverPopover">
-  <div class="cover-popover-title" id="coverPopoverTitle">Sửa bìa tập</div>
-  <div class="cover-popover-preview-wrap">
-    <img class="cover-popover-preview" id="coverPopoverPreview" src="" alt="">
-  </div>
-  <label class="cover-popover-label">URL ảnh bìa</label>
-  <input class="cover-popover-input" type="text" id="coverPopoverInput"
-         placeholder="https://..." oninput="previewCoverUrl(this.value)">
-  <div class="cover-popover-actions">
-    <button class="btn-cancel" onclick="closeCoverPopover()">Hủy</button>
-    <button class="btn-primary" id="coverSaveBtn" onclick="saveCoverUrl()">💾 Lưu</button>
-  </div>
-</div>
-
-<style>
-/* ── Bottom sheet ── */
-.sheet-backdrop {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 400;
-  backdrop-filter: blur(2px);
-}
-.sheet-backdrop.open { display: block; }
-
-.bottom-sheet {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--surface);
-  border-radius: 20px 20px 0 0;
-  z-index: 500;
-  padding: 0 20px 32px;
-  max-height: 92dvh;
-  overflow-y: auto;
-  transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(.32,1,.42,1);
-  box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
-}
-.bottom-sheet.open { transform: translateY(0); }
-
-.sheet-handle {
-  width: 40px; height: 4px;
-  background: var(--border);
-  border-radius: 4px;
-  margin: 14px auto 6px;
-}
-.sheet-header {
-  display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 12px;
-  padding: 10px 0 14px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 16px;
-}
-.sheet-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
-.sheet-sub   { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-.sheet-close {
-  width: 30px; height: 30px; border-radius: 50%;
-  border: 1px solid var(--border); background: var(--bg-alt);
-  font-size: 13px; cursor: pointer; color: var(--text-2);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.sheet-msg { display: none; padding: 9px 12px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 12px; }
-.sheet-msg.error   { background: var(--red-bg);   color: var(--red-fg);   display: block; }
-.sheet-msg.success { background: var(--green-bg); color: var(--green-fg); display: block; }
-
-.sheet-section-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
-  text-transform: uppercase; color: var(--text-3); margin-bottom: 10px;
-}
-.sheet-add-row { display: flex; gap: 10px; margin-bottom: 10px; }
-.sheet-field { display: flex; flex-direction: column; gap: 5px; }
-.sheet-field label { font-size: 12px; font-weight: 600; color: var(--text-2); }
-.sheet-field input {
-  padding: 11px 12px;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 15px; background: var(--bg); color: var(--text);
-  outline: none; font-family: var(--font); transition: border-color 0.2s;
-}
-.sheet-field input:focus { border-color: var(--accent); }
-.sheet-field:first-child { width: 90px; flex-shrink: 0; }
-.sheet-field-cover { flex: 1; }
-.sheet-add-btn { width: 100%; padding: 13px; font-size: 15px; justify-content: center; border-radius: var(--radius-sm); }
-.sheet-vol-tip {
-  font-size: 12px; color: var(--text-3);
-  background: var(--bg-alt); padding: 8px 10px;
-  border-radius: var(--radius-xs); margin-bottom: 12px;
-}
-
-/* ── Vol item: long-press / dblclick visual cue ── */
-.vol-item { user-select: none; -webkit-user-select: none; }
-.vol-item.pressing {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
-}
-/* Nút sửa bìa (✎) — luôn ẩn, hiện khi hover/admin */
-.vol-edit-btn {
-  position: absolute;
-  bottom: 26px; right: 3px;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-text);
-  border: none; font-size: 9px;
-  cursor: pointer;
-  display: none;
-  align-items: center; justify-content: center;
-  z-index: 2;
-}
-.vol-item:hover .vol-edit-btn { display: flex; }
-@media (max-width: 768px) {
-  /* Trên mobile hiện luôn cả 2 nút */
-  .vol-del-btn,
-  .vol-edit-btn { display: flex !important; }
-  .vol-item    { padding: 8px 6px; }
-  .vol-cover-mini { width: 52px; height: 72px; }
-  .vol-num     { font-size: 12px; }
-  .vol-grid    { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; }
-  .form-grid   { grid-template-columns: 1fr; }
-  .form-full   { grid-column: unset; }
-  .modal       { padding: 20px 16px; border-radius: 20px 20px 0 0; }
-  .modal-footer .btn-primary,
-  .modal-footer .btn-cancel { flex: 1; justify-content: center; }
-}
-
-/* ── Cover edit popover ── */
-.cover-popover-backdrop {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45);
-  z-index: 600;
-  backdrop-filter: blur(2px);
-}
-.cover-popover-backdrop.open { display: block; }
-
-.cover-popover {
-  position: fixed;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -40%) scale(0.96);
-  width: min(420px, calc(100vw - 32px));
-  background: var(--surface);
-  border-radius: var(--radius-xl);
-  padding: 22px 20px 20px;
-  z-index: 700;
-  box-shadow: var(--shadow-lg);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s, transform 0.22s cubic-bezier(.34,1.3,.64,1);
-}
-.cover-popover.open {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.cover-popover-title {
-  font-size: 15px; font-weight: 800;
-  color: var(--text); letter-spacing: -0.02em;
-  margin-bottom: 14px;
-}
-.cover-popover-preview-wrap {
-  width: 100%; display: flex; justify-content: center;
-  margin-bottom: 14px;
-  min-height: 80px;
-}
-.cover-popover-preview {
-  max-height: 160px; max-width: 120px;
-  object-fit: contain;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-alt);
-  display: none;
-}
-.cover-popover-preview.visible { display: block; }
-.cover-popover-label {
-  display: block; font-size: 12px; font-weight: 700;
-  color: var(--text-2); margin-bottom: 6px;
-}
-.cover-popover-input {
-  width: 100%; padding: 11px 12px;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 14px; background: var(--bg); color: var(--text);
-  outline: none; font-family: var(--font);
-  transition: border-color 0.2s;
-  margin-bottom: 16px;
-}
-.cover-popover-input:focus { border-color: var(--accent); }
-.cover-popover-actions {
-  display: flex; gap: 8px; justify-content: flex-end;
-}
-.cover-popover-actions .btn-primary,
-.cover-popover-actions .btn-cancel { flex: 1; justify-content: center; }
-
-/* Desktop: sheet → modal */
-@media (min-width: 769px) {
-  .sheet-backdrop { backdrop-filter: blur(2px); }
-  .bottom-sheet {
-    bottom: unset; left: 50%; top: 50%;
-    transform: translate(-50%, -40%);
-    width: 100%; max-width: 560px;
-    border-radius: 20px; max-height: 88vh;
-    transition: none; opacity: 0; pointer-events: none;
-  }
-  .bottom-sheet.open {
-    transform: translate(-50%, -50%);
-    opacity: 1; pointer-events: auto;
-    transition: opacity 0.2s, transform 0.25s cubic-bezier(.34,1.3,.64,1);
-  }
-  .sheet-handle { display: none; }
-}
-</style>
 
 <script>
 (function() {
@@ -421,7 +340,7 @@ function openAddVolSheet() {
   document.getElementById("sheetVolNum").value = nextVolNum();
   document.getElementById("sheetVolCover").value = "";
   document.getElementById("sheetMsg").className = "sheet-msg";
-  renderSheetVolGrid();
+  renderSheetVolList();
   document.getElementById("sheetBackdrop").classList.add("open");
   document.getElementById("bottomSheet").classList.add("open");
   document.body.style.overflow = "hidden";
@@ -436,92 +355,141 @@ function nextVolNum() {
   return vols.length ? Math.max(...vols.map(v => v.number)) + 1 : 1;
 }
 
-/* ── Render vol-grid trong sheet ── */
-function renderSheetVolGrid() {
+/* ── Render vol-list trong sheet (list style) ── */
+function renderSheetVolList() {
   const vols = [...currentBook.volumes].sort((a, b) => a.number - b.number);
-  const grid = document.getElementById("sheetVolGrid");
+  const listEl = document.getElementById("sheetVolList");
+
   if (!vols.length) {
-    grid.innerHTML = '<div style="color:var(--text-3);font-size:14px;grid-column:1/-1;text-align:center;padding:16px 0">Chưa có tập nào.</div>';
+    listEl.innerHTML = '<div style="color:var(--text-3);font-size:14px;text-align:center;padding:16px 0">Chưa có tập nào.</div>';
     return;
   }
-  grid.innerHTML = vols.map(v => `
-    <div class="vol-item ${v.owned ? 'owned' : ''}"
-         id="vi-${v.id}"
-         data-vol-id="${v.id}"
-         data-owned="${v.owned}"
-         title="Tập ${v.number}">
-      <button class="vol-del-btn"  onclick="event.stopPropagation(); sheetDeleteVol(${v.id})">✕</button>
-      <button class="vol-edit-btn" onclick="event.stopPropagation(); openCoverPopover(${v.id})" title="Sửa bìa">✎</button>
-      ${v.cover
-        ? `<img class="vol-cover-mini" src="${esc(v.cover)}" onerror="this.style.display='none'">`
-        : `<div style="width:48px;height:66px;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:4px;background:var(--bg-alt)">📖</div>`}
-      <div class="vol-num">Tập ${v.number}</div>
-      ${v.owned ? '<div class="vol-owned-dot"></div>' : ''}
+
+  listEl.innerHTML = vols.map(v => `
+    <div class="vl-row ${v.owned ? 'owned' : ''}" id="vl-${v.id}" data-vol-id="${v.id}" data-owned="${v.owned}">
+      <div class="vl-cover-wrap" data-toggle-id="${v.id}">
+        ${v.cover
+          ? `<img class="vl-cover" src="${esc(v.cover)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+             <div class="vl-cover-placeholder" style="display:none">📖</div>`
+          : `<div class="vl-cover-placeholder">📖</div>`}
+        <div class="vl-owned-badge">${v.owned ? '✓' : ''}</div>
+      </div>
+      <div class="vl-info">
+        <div class="vl-num">Tập ${v.number}</div>
+        <div class="vl-url-row">
+          <input class="vl-url-input" type="url" inputmode="url"
+            placeholder="https://... (URL ảnh bìa)"
+            value="${esc(v.cover || '')}"
+            data-vol-id="${v.id}"
+            data-original="${esc(v.cover || '')}">
+          <button class="vl-save-btn" data-vol-id="${v.id}" onclick="vlSaveCover(this)">💾</button>
+        </div>
+      </div>
+      <button class="vl-del-btn" onclick="event.stopPropagation(); sheetDeleteVol(${v.id})">✕</button>
     </div>
   `).join('');
 
-  /* Gắn click + long-press cho từng vol-item */
-  grid.querySelectorAll(".vol-item").forEach(el => {
-    attachVolItemEvents(el);
+  /* Attach touch-safe toggle to each cover */
+  listEl.querySelectorAll('.vl-cover-wrap').forEach(el => {
+    let startX, startY, moved = false;
+
+    el.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      moved  = false;
+    }, { passive: true });
+
+    el.addEventListener('touchmove', e => {
+      const dx = Math.abs(e.touches[0].clientX - startX);
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      if (dx > 8 || dy > 8) moved = true;
+    }, { passive: true });
+
+    el.addEventListener('touchend', e => {
+      if (moved) return;          // người dùng đang vuốt, không toggle
+      e.preventDefault();
+      const volId = parseInt(el.dataset.toggleId);
+      const row = document.getElementById('vl-' + volId);
+      sheetToggleOwned(volId, row.dataset.owned === 'true');
+    });
+
+    /* Desktop click */
+    el.addEventListener('click', () => {
+      const volId = parseInt(el.dataset.toggleId);
+      const row = document.getElementById('vl-' + volId);
+      sheetToggleOwned(volId, row.dataset.owned === 'true');
+    });
   });
 }
 
-/* ── Long-press / dblclick helper ── */
-function attachVolItemEvents(el) {
-  const volId      = parseInt(el.dataset.volId);
-  let pressTimer   = null;
-  let didLongPress = false;
+/* ── Save cover URL inline ── */
+async function vlSaveCover(btn) {
+  const volId  = parseInt(btn.dataset.volId);
+  const input  = btn.previousElementSibling;
+  const newUrl = input.value.trim() || null;
+  const msgEl  = document.getElementById("sheetMsg");
 
-  /* Mobile: long press 600ms → sửa bìa */
-  el.addEventListener("touchstart", e => {
-    didLongPress = false;
-    pressTimer = setTimeout(() => {
-      didLongPress = true;
-      el.classList.add("pressing");
-      openCoverPopover(volId);
-    }, 600);
-  }, { passive: true });
+  btn.disabled = true;
+  btn.textContent = "⏳";
 
-  el.addEventListener("touchend", e => {
-    clearTimeout(pressTimer);
-    setTimeout(() => el.classList.remove("pressing"), 200);
-    if (didLongPress) { didLongPress = false; return; } // đã xử lý
-    // Short tap → toggle owned
-    sheetToggleOwned(volId, el.dataset.owned === "true");
-  });
+  try {
+    await sbPatch2("volumes", `id=eq.${volId}`, { cover: newUrl });
+    const v = currentBook.volumes.find(x => x.id === volId);
+    if (v) v.cover = newUrl;
+    input.dataset.original = newUrl || '';
+    renderVolumes(currentBook);
+    msgEl.textContent = "Đã cập nhật bìa ✓"; msgEl.className = "sheet-msg success";
+    setTimeout(() => { msgEl.className = "sheet-msg"; }, 2500);
 
-  el.addEventListener("touchmove", () => {
-    clearTimeout(pressTimer);
-    didLongPress = false;
-  }, { passive: true });
-
-  /* Desktop: dblclick → sửa bìa; click → toggle owned */
-  el.addEventListener("dblclick", e => {
-    e.stopPropagation();
-    openCoverPopover(volId);
-  });
-  el.addEventListener("click", e => {
-    if (e.detail === 1) {
-      // dùng timeout nhỏ để nhường dblclick
-      setTimeout(() => {
-        if (!e.target.closest(".vol-del-btn") && !e.target.closest(".vol-edit-btn")) {
-          sheetToggleOwned(volId, el.dataset.owned === "true");
+    // Cập nhật lại cover img trong row hiện tại
+    const row = document.getElementById('vl-' + volId);
+    if (row) {
+      const img = row.querySelector('.vl-cover');
+      const placeholder = row.querySelector('.vl-cover-placeholder');
+      if (newUrl) {
+        if (img) { img.src = newUrl; img.style.display = ''; }
+        else {
+          const newImg = document.createElement('img');
+          newImg.className = 'vl-cover'; newImg.src = newUrl;
+          newImg.onerror = () => { newImg.style.display='none'; if(placeholder) placeholder.style.display='flex'; };
+          row.querySelector('.vl-cover-wrap').prepend(newImg);
         }
-      }, 200);
+        if (placeholder) placeholder.style.display = 'none';
+      } else {
+        if (img) img.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'flex';
+      }
     }
-  });
+  } catch(e) {
+    msgEl.textContent = "Lỗi: " + e.message; msgEl.className = "sheet-msg error";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "💾";
+  }
 }
 
 /* ── Toggle owned ── */
 async function sheetToggleOwned(volId, currentOwned) {
+  const msgEl = document.getElementById("sheetMsg");
   try {
     await sbPatch2("volumes", `id=eq.${volId}`, { owned: !currentOwned });
     const v = currentBook.volumes.find(x => x.id === volId);
-    if (v) { v.owned = !currentOwned; currentBook.owned = currentBook.volumes.filter(x => x.owned).length; }
+    if (v) { v.owned = !currentOwned; }
+    currentBook.owned = currentBook.volumes.filter(x => x.owned).length;
     updateProgress(currentBook); updateCounts(currentBook);
-    renderVolumes(currentBook); renderSheetVolGrid();
+    renderVolumes(currentBook);
+
+    /* Cập nhật row trong list mà không re-render toàn bộ */
+    const row = document.getElementById('vl-' + volId);
+    if (row) {
+      const newOwned = !currentOwned;
+      row.dataset.owned = String(newOwned);
+      row.classList.toggle('owned', newOwned);
+      const badge = row.querySelector('.vl-owned-badge');
+      if (badge) badge.textContent = newOwned ? '✓' : '';
+    }
+    document.getElementById("sheetSub").textContent = currentBook.title + " · " + currentBook.volumes.length + " tập";
   } catch(e) {
-    const msgEl = document.getElementById("sheetMsg");
     msgEl.textContent = "Lỗi: " + e.message; msgEl.className = "sheet-msg error";
   }
 }
@@ -543,7 +511,7 @@ async function sheetAddVolume() {
     document.getElementById("sheetVolNum").value = nextVolNum();
     document.getElementById("sheetVolCover").value = "";
     updateProgress(currentBook); updateCounts(currentBook);
-    renderVolumes(currentBook); renderSheetVolGrid();
+    renderVolumes(currentBook); renderSheetVolList();
     document.getElementById("sheetSub").textContent = currentBook.title + " · " + currentBook.volumes.length + " tập";
     msgEl.textContent = `Đã thêm tập ${num} ✓`; msgEl.className = "sheet-msg success";
     setTimeout(() => { msgEl.className = "sheet-msg"; }, 2500);
@@ -563,75 +531,12 @@ async function sheetDeleteVol(volId) {
     currentBook.total = currentBook.volumes.length;
     currentBook.owned = currentBook.volumes.filter(v => v.owned).length;
     updateProgress(currentBook); updateCounts(currentBook);
-    renderVolumes(currentBook); renderSheetVolGrid();
+    renderVolumes(currentBook); renderSheetVolList();
     document.getElementById("sheetSub").textContent = currentBook.title + " · " + currentBook.volumes.length + " tập";
   } catch(e) {
     msgEl.textContent = "Lỗi xóa: " + e.message; msgEl.className = "sheet-msg error";
   }
 }
-
-/* ===== Cover Popover ===== */
-let coverEditingVolId = null;
-
-function openCoverPopover(volId) {
-  coverEditingVolId = volId;
-  const v = currentBook.volumes.find(x => x.id === volId);
-  if (!v) return;
-  document.getElementById("coverPopoverTitle").textContent = `Sửa bìa — Tập ${v.number}`;
-  const input = document.getElementById("coverPopoverInput");
-  input.value = v.cover || "";
-  previewCoverUrl(v.cover || "");
-  document.getElementById("coverPopoverBackdrop").classList.add("open");
-  document.getElementById("coverPopover").classList.add("open");
-  setTimeout(() => input.focus(), 250);
-}
-
-function closeCoverPopover() {
-  coverEditingVolId = null;
-  document.getElementById("coverPopoverBackdrop").classList.remove("open");
-  document.getElementById("coverPopover").classList.remove("open");
-}
-
-function previewCoverUrl(url) {
-  const img = document.getElementById("coverPopoverPreview");
-  if (url && url.startsWith("http")) {
-    img.src = url;
-    img.classList.add("visible");
-    img.onerror = () => img.classList.remove("visible");
-  } else {
-    img.src = "";
-    img.classList.remove("visible");
-  }
-}
-
-async function saveCoverUrl() {
-  const newCover = document.getElementById("coverPopoverInput").value.trim() || null;
-  const btn = document.getElementById("coverSaveBtn");
-  btn.disabled = true; btn.textContent = "Đang lưu...";
-  try {
-    await sbPatch2("volumes", `id=eq.${coverEditingVolId}`, { cover: newCover });
-    const v = currentBook.volumes.find(x => x.id === coverEditingVolId);
-    if (v) v.cover = newCover;
-    renderVolumes(currentBook);
-    renderSheetVolGrid();
-    closeCoverPopover();
-    /* Flash success msg trong sheet */
-    const msgEl = document.getElementById("sheetMsg");
-    msgEl.textContent = "Đã cập nhật bìa ✓"; msgEl.className = "sheet-msg success";
-    setTimeout(() => { msgEl.className = "sheet-msg"; }, 2500);
-  } catch(e) {
-    alert("Lỗi lưu bìa: " + e.message);
-  } finally {
-    btn.disabled = false; btn.innerHTML = "💾 Lưu";
-  }
-}
-
-/* Đóng popover bằng Escape */
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && document.getElementById("coverPopover").classList.contains("open")) {
-    closeCoverPopover();
-  }
-});
 
 function esc(s) {
   return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
