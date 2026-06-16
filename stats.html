@@ -5,6 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thống kê — Kho Sách</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+/* ── Vol-list (list style) ── */
+.vol-list { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.vl-row {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px;
+  border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);
+  background:var(--bg);
+  transition:border-color 0.15s, background 0.15s;
+}
+.vl-row.owned {
+  border-color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.vl-cover-wrap {
+  position:relative; flex-shrink:0;
+  width:42px; height:58px;
+  border-radius:var(--radius-xs); overflow:hidden; cursor:pointer;
+  border:1px solid var(--border); background:var(--bg-alt);
+  user-select:none; -webkit-user-select:none;
+}
+.vl-cover { width:100%; height:100%; object-fit:cover; display:block; }
+.vl-cover-placeholder { width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px; }
+.vl-owned-badge {
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;color:var(--accent-text);
+  background:rgba(0,0,0,0);transition:background 0.15s;pointer-events:none;
+}
+.vl-row.owned .vl-owned-badge { background:color-mix(in srgb, var(--accent) 65%, transparent); }
+.vl-info { flex:1;min-width:0;display:flex;flex-direction:column;gap:5px; }
+.vl-num  { font-size:13px;font-weight:700;color:var(--text); }
+.vl-url-row { display:flex;gap:6px;align-items:center; }
+.vl-url-input {
+  flex:1;min-width:0;padding:6px 10px;
+  border:1.5px solid var(--border);border-radius:var(--radius-xs);
+  font-size:12px;background:var(--surface);color:var(--text);
+  outline:none;font-family:inherit;transition:border-color 0.15s;
+}
+.vl-url-input:focus { border-color:var(--accent); }
+.vl-save-btn {
+  flex-shrink:0;padding:6px 10px;border-radius:var(--radius-xs);
+  background:var(--accent);color:var(--accent-text);
+  border:none;font-size:13px;cursor:pointer;transition:opacity 0.15s;white-space:nowrap;
+}
+.vl-save-btn:hover   { opacity:0.85; }
+.vl-save-btn:disabled { opacity:0.5;cursor:not-allowed; }
+.vl-del-btn {
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  background:var(--red-bg);color:var(--red-fg);
+  border:none;font-size:11px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:opacity 0.15s;
+}
+.vl-del-btn:hover { opacity:0.75; }
+@media (max-width:480px) {
+  .vl-url-input { font-size:13px;padding:7px 8px; }
+  .vl-save-btn  { font-size:14px;padding:7px 10px; }
+}
+  </style>
 </head>
 <body>
 
@@ -156,8 +216,8 @@
       <input type="text" id="volCoverInput" placeholder="URL bìa tập (tuỳ chọn)">
       <button class="btn-primary" style="padding:8px 14px;font-size:13px" onclick="addVolume()">＋ Thêm</button>
     </div>
-    <div class="vol-tip">Nhấn = đổi sở hữu · Giữ 1s / ✎ = sửa bìa · ✕ = xóa tập</div>
-    <div class="vol-grid" id="volGrid"></div>
+    <div class="vol-tip">Nhấn bìa = đổi sở hữu &nbsp;·&nbsp; Sửa URL rồi 💾 = cập nhật bìa &nbsp;·&nbsp; ✕ = xóa tập</div>
+    <div class="vol-list" id="volGrid"></div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeVolumeModal()">Đóng</button>
     </div>
@@ -174,22 +234,6 @@
       <button class="btn-cancel" onclick="closeModal('delModal')">Hủy</button>
       <button class="btn-danger" id="delConfirmBtn">Xóa vĩnh viễn</button>
     </div>
-  </div>
-</div>
-
-<!-- ===== COVER EDIT POPOVER ===== -->
-<div class="cover-popover-backdrop" id="coverPopoverBackdrop" onclick="closeCoverPopover()"></div>
-<div class="cover-popover" id="coverPopover">
-  <div class="cover-popover-title" id="coverPopoverTitle">Sửa bìa tập</div>
-  <div class="cover-popover-preview-wrap">
-    <img class="cover-popover-preview" id="coverPopoverPreview" src="" alt="">
-  </div>
-  <label class="cover-popover-label">URL ảnh bìa</label>
-  <input class="cover-popover-input" type="text" id="coverPopoverInput"
-         placeholder="https://..." oninput="previewCoverUrl(this.value)">
-  <div class="cover-popover-actions">
-    <button class="btn-cancel" onclick="closeCoverPopover()">Hủy</button>
-    <button class="btn-primary" id="coverSaveBtn" onclick="saveCoverUrl()">💾 Lưu</button>
   </div>
 </div>
 
@@ -320,6 +364,7 @@ async function doDelete(bookId) {
   finally { btn.disabled=false; btn.textContent='Xóa vĩnh viễn'; }
 }
 
+/* ── Volume modal ── */
 function openVolumeModal(bookId) {
   currentVolBookId=bookId; const b=allBooks.find(x=>x.id===bookId);
   document.getElementById('volBookTitle').textContent=b.title;
@@ -327,109 +372,122 @@ function openVolumeModal(bookId) {
   document.getElementById('volModalMsg').className='modal-msg';
   document.getElementById('volNumInput').value=nextVolNum(bookId);
   document.getElementById('volCoverInput').value='';
-  renderVolGrid(bookId);
+  renderVolList(bookId);
   document.getElementById('volModal').classList.add('open');
 }
 function closeVolumeModal() { document.getElementById('volModal').classList.remove('open'); }
 function nextVolNum(bookId) { const vols=volsByBook[bookId]||[]; return vols.length?Math.max(...vols.map(v=>v.number))+1:1; }
 
-function renderVolGrid(bookId) {
+function renderVolList(bookId) {
   const vols=(volsByBook[bookId]||[]).slice().sort((a,b)=>a.number-b.number);
-  const grid=document.getElementById('volGrid');
-  if (!vols.length) { grid.innerHTML='<div style="color:var(--text-3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px 0">Chưa có tập nào.</div>'; return; }
-  grid.innerHTML=vols.map(v=>`
-    <div class="vol-item ${v.owned?'owned':''}" id="vi-${v.id}" data-vol-id="${v.id}" data-owned="${v.owned}" title="Tập ${v.number}">
-      <button class="vol-del-btn"  onclick="event.stopPropagation();deleteVol(${v.id})">✕</button>
-      <button class="vol-edit-btn" onclick="event.stopPropagation();openCoverPopover(${v.id})">✎</button>
-      ${v.cover?`<img class="vol-cover-mini" src="${esc(v.cover)}" onerror="this.style.display='none'">`:'<div style="width:48px;height:66px;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:4px;background:var(--bg-alt)">📖</div>'}
-      <div class="vol-num">Tập ${v.number}</div>
-      ${v.owned?'<div class="vol-owned-dot"></div>':''}
+  const el=document.getElementById('volGrid');
+  if (!el) return;
+  if (!vols.length) { el.innerHTML='<div style="color:var(--text-3);font-size:14px;text-align:center;padding:20px 0">Chưa có tập nào.</div>'; return; }
+
+  el.innerHTML=vols.map(v=>`
+    <div class="vl-row ${v.owned?'owned':''}" id="vlr-${v.id}" data-vol-id="${v.id}" data-owned="${v.owned}">
+      <div class="vl-cover-wrap" data-toggle-id="${v.id}">
+        ${v.cover
+          ? `<img class="vl-cover" src="${esc(v.cover)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+             <div class="vl-cover-placeholder" style="display:none">📖</div>`
+          : `<div class="vl-cover-placeholder">📖</div>`}
+        <div class="vl-owned-badge">${v.owned?'✓':''}</div>
+      </div>
+      <div class="vl-info">
+        <div class="vl-num">Tập ${v.number}</div>
+        <div class="vl-url-row">
+          <input class="vl-url-input" type="url" inputmode="url"
+            placeholder="https://... (URL ảnh bìa)"
+            value="${esc(v.cover||'')}"
+            data-vol-id="${v.id}" data-book-id="${bookId}">
+          <button class="vl-save-btn" data-vol-id="${v.id}" data-book-id="${bookId}" onclick="vlSaveCover(this)">💾</button>
+        </div>
+      </div>
+      <button class="vl-del-btn" onclick="event.stopPropagation();deleteVol(${v.id})">✕</button>
     </div>
   `).join('');
 
-  grid.querySelectorAll('.vol-item').forEach(el=>{
-    const volId=parseInt(el.dataset.volId);
-    let pressTimer=null,didLong=false;
-    el.addEventListener('touchstart',()=>{ didLong=false; pressTimer=setTimeout(()=>{ didLong=true; el.classList.add('pressing'); openCoverPopover(volId); },600); },{passive:true});
-    el.addEventListener('touchend',()=>{ clearTimeout(pressTimer); setTimeout(()=>el.classList.remove('pressing'),200); if(didLong){didLong=false;return;} toggleOwned(volId,el.dataset.owned==='true'); });
-    el.addEventListener('touchmove',()=>{ clearTimeout(pressTimer); didLong=false; },{passive:true});
-    el.addEventListener('dblclick',e=>{ e.stopPropagation(); openCoverPopover(volId); });
-    el.addEventListener('click',e=>{ if(e.detail===1){ setTimeout(()=>{ if(!e.target.closest('.vol-del-btn')&&!e.target.closest('.vol-edit-btn')) toggleOwned(volId,el.dataset.owned==='true'); },200); } });
+  el.querySelectorAll('.vl-cover-wrap').forEach(coverEl => {
+    let startX, startY, moved=false;
+    coverEl.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; startY=e.touches[0].clientY; moved=false; },{passive:true});
+    coverEl.addEventListener('touchmove',e=>{ if(Math.abs(e.touches[0].clientX-startX)>8||Math.abs(e.touches[0].clientY-startY)>8) moved=true; },{passive:true});
+    coverEl.addEventListener('touchend',e=>{
+      if(moved) return;
+      e.preventDefault();
+      const volId=parseInt(coverEl.dataset.toggleId);
+      const row=document.getElementById('vlr-'+volId);
+      toggleOwned(volId,row.dataset.owned==='true');
+    });
+    coverEl.addEventListener('click',()=>{
+      const volId=parseInt(coverEl.dataset.toggleId);
+      const row=document.getElementById('vlr-'+volId);
+      toggleOwned(volId,row.dataset.owned==='true');
+    });
   });
+}
+
+async function vlSaveCover(btn) {
+  const volId=parseInt(btn.dataset.volId), bookId2=btn.dataset.bookId;
+  const input=btn.previousElementSibling, newUrl=input.value.trim()||null;
+  btn.disabled=true; btn.textContent="⏳";
+  try {
+    await sbPatch('volumes',`id=eq.${volId}`,{cover:newUrl});
+    const v=(volsByBook[bookId2]||[]).find(x=>x.id===volId); if(v) v.cover=newUrl;
+    const row=document.getElementById('vlr-'+volId);
+    if (row) {
+      const img=row.querySelector('.vl-cover'), ph=row.querySelector('.vl-cover-placeholder');
+      if (newUrl) {
+        if (img){img.src=newUrl;img.style.display='';}
+        else { const ni=document.createElement('img'); ni.className='vl-cover'; ni.src=newUrl; ni.onerror=()=>{ni.style.display='none';if(ph)ph.style.display='flex';}; row.querySelector('.vl-cover-wrap').prepend(ni); }
+        if(ph) ph.style.display='none';
+      } else { if(img) img.style.display='none'; if(ph) ph.style.display='flex'; }
+    }
+    renderAdminTable(); showToast('Đã cập nhật bìa ✓');
+  } catch(e) { showToast('Lỗi lưu bìa: '+e.message,true); }
+  finally { btn.disabled=false; btn.textContent='💾'; }
 }
 
 async function addVolume() {
   const num=parseInt(document.getElementById('volNumInput').value),cover=document.getElementById('volCoverInput').value.trim()||null;
   const msgEl=document.getElementById('volModalMsg'); msgEl.className='modal-msg';
-  if (!num||num<1) { msgEl.textContent='Số tập không hợp lệ.'; msgEl.className='modal-msg error'; return; }
-  if ((volsByBook[currentVolBookId]||[]).find(v=>v.number===num)) { msgEl.textContent=`Tập ${num} đã tồn tại.`; msgEl.className='modal-msg error'; return; }
+  if (!num||num<1){msgEl.textContent='Số tập không hợp lệ.';msgEl.className='modal-msg error';return;}
+  if ((volsByBook[currentVolBookId]||[]).find(v=>v.number===num)){msgEl.textContent=`Tập ${num} đã tồn tại.`;msgEl.className='modal-msg error';return;}
   try {
     const res=await sbPost('volumes',{book_id:currentVolBookId,number:num,owned:false,cover});
     if (!volsByBook[currentVolBookId]) volsByBook[currentVolBookId]=[];
     volsByBook[currentVolBookId].push(res[0]);
     document.getElementById('volNumInput').value=nextVolNum(currentVolBookId);
     document.getElementById('volCoverInput').value='';
-    renderVolGrid(currentVolBookId); renderAdminTable(); showToast(`Đã thêm tập ${num} ✓`);
-  } catch(e) { msgEl.textContent='Lỗi: '+e.message; msgEl.className='modal-msg error'; }
+    renderVolList(currentVolBookId); renderAdminTable(); showToast(`Đã thêm tập ${num} ✓`);
+  } catch(e){msgEl.textContent='Lỗi: '+e.message;msgEl.className='modal-msg error';}
 }
 
 async function toggleOwned(volId,currentOwned) {
   try {
     await sbPatch('volumes',`id=eq.${volId}`,{owned:!currentOwned});
-    for (const bid in volsByBook) { const v=volsByBook[bid].find(x=>x.id===volId); if(v){v.owned=!currentOwned;break;} }
-    renderVolGrid(currentVolBookId); renderAdminTable();
-  } catch(e) { showToast('Lỗi cập nhật: '+e.message,true); }
+    for (const bid in volsByBook){const v=volsByBook[bid].find(x=>x.id===volId);if(v){v.owned=!currentOwned;break;}}
+    const row=document.getElementById('vlr-'+volId);
+    if (row) {
+      const n=!currentOwned; row.dataset.owned=String(n);
+      row.classList.toggle('owned',n);
+      const badge=row.querySelector('.vl-owned-badge'); if(badge) badge.textContent=n?'✓':'';
+    }
+    renderAdminTable();
+  } catch(e){showToast('Lỗi cập nhật: '+e.message,true);}
 }
 
 async function deleteVol(volId) {
   try {
     await sbDelete('volumes',`id=eq.${volId}`);
     for (const bid in volsByBook) volsByBook[bid]=volsByBook[bid].filter(x=>x.id!==volId);
-    renderVolGrid(currentVolBookId); renderAdminTable(); showToast('Đã xóa tập ✓');
-  } catch(e) { showToast('Lỗi xóa tập: '+e.message,true); }
+    renderVolList(currentVolBookId); renderAdminTable(); showToast('Đã xóa tập ✓');
+  } catch(e){showToast('Lỗi xóa tập: '+e.message,true);}
 }
 
-/* ===== Cover Popover ===== */
-let coverEditingVolId=null,coverEditingBookId=null;
-
-function openCoverPopover(volId) {
-  coverEditingVolId=volId; let foundVol=null;
-  for (const bid in volsByBook) { foundVol=volsByBook[bid].find(x=>x.id===volId); if(foundVol){coverEditingBookId=bid;break;} }
-  if (!foundVol) return;
-  document.getElementById('coverPopoverTitle').textContent=`Sửa bìa — Tập ${foundVol.number}`;
-  const input=document.getElementById('coverPopoverInput');
-  input.value=foundVol.cover||''; previewCoverUrl(foundVol.cover||'');
-  document.getElementById('coverPopoverBackdrop').classList.add('open');
-  document.getElementById('coverPopover').classList.add('open');
-  setTimeout(()=>input.focus(),250);
-}
-function closeCoverPopover() {
-  coverEditingVolId=null;
-  document.getElementById('coverPopoverBackdrop').classList.remove('open');
-  document.getElementById('coverPopover').classList.remove('open');
-}
-function previewCoverUrl(url) {
-  const img=document.getElementById('coverPopoverPreview');
-  if (url&&url.startsWith('http')) { img.src=url; img.classList.add('visible'); img.onerror=()=>img.classList.remove('visible'); }
-  else { img.src=''; img.classList.remove('visible'); }
-}
-async function saveCoverUrl() {
-  const newCover=document.getElementById('coverPopoverInput').value.trim()||null;
-  const btn=document.getElementById('coverSaveBtn'); btn.disabled=true; btn.textContent='Đang lưu...';
-  try {
-    await sbPatch('volumes',`id=eq.${coverEditingVolId}`,{cover:newCover});
-    const v=volsByBook[coverEditingBookId]?.find(x=>x.id===coverEditingVolId);
-    if (v) v.cover=newCover;
-    closeCoverPopover(); renderVolGrid(coverEditingBookId); renderAdminTable(); showToast('Đã cập nhật bìa ✓');
-  } catch(e) { showToast('Lỗi lưu bìa: '+e.message,true); }
-  finally { btn.disabled=false; btn.innerHTML='💾 Lưu'; }
-}
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('coverPopover').classList.contains('open')) closeCoverPopover(); });
-
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 let toastTimer;
-function showToast(msg,isError=false) {
+function showToast(msg,isError=false){
   const t=document.getElementById('toast'); t.textContent=msg;
   t.style.background=isError?'var(--red-fg)':'var(--text)';
   t.classList.add('show'); clearTimeout(toastTimer);
@@ -467,7 +525,7 @@ function renderStatCards() {
 function renderShelfChart() {
   const shelfMeta={reading:{label:"📖 Chưa đủ bộ",cls:"reading"},next:{label:"🕒 Wishlist",cls:"next"},finished:{label:"✅ Hoàn thành",cls:"finished"}};
   const counts={reading:0,next:0,finished:0}, volumes={reading:0,next:0,finished:0};
-  books.forEach(b=>{ if(counts[b.shelf]!==undefined){counts[b.shelf]++;volumes[b.shelf]+=b.owned;} });
+  books.forEach(b=>{if(counts[b.shelf]!==undefined){counts[b.shelf]++;volumes[b.shelf]+=b.owned;}});
   const maxCount=Math.max(...Object.values(counts),1);
   document.getElementById("shelfChart").innerHTML=Object.entries(shelfMeta).map(([key,meta])=>`
     <div class="shelf-row">
@@ -481,7 +539,7 @@ function renderShelfChart() {
 function renderMissingList() {
   const missing=books.filter(b=>b.owned<b.total).sort((a,b)=>(b.owned/b.total)-(a.owned/a.total));
   const el=document.getElementById("missingList");
-  if (!missing.length) { el.innerHTML=`<div class="all-complete">🎉 Tất cả bộ đều đã đủ tập!</div>`; return; }
+  if (!missing.length){el.innerHTML=`<div class="all-complete">🎉 Tất cả bộ đều đã đủ tập!</div>`;return;}
   el.innerHTML=missing.map(book=>{
     const lack=book.total-book.owned, pct=Math.round((book.owned/book.total)*100);
     return `<a class="missing-item" href="book-detail.html?id=${book.id}&filter=missing">
