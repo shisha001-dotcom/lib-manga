@@ -21,73 +21,105 @@
   }
   .sidebar.open { transform: translateX(0); }
 
-  /* ── Page padding — chừa chỗ cho sticky topbar ── */
-  .main-content { padding: 112px 14px 40px; }
-  .stats-main   { padding: 112px 14px 48px; }
+  /* ── Page padding ── */
+  .main-content { padding: 64px 14px 40px; }
+  .stats-main   { padding: 64px 14px 48px; }
   .detail-page  { padding: 64px 14px 48px; }
 
   /* ── Book grids ── */
   .book-grid   { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
   .detail-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
 
-  /* ── Sticky topbar wrapper ── */
+  /* ── Sticky topbar: 1 hàng ngang duy nhất ── */
   .topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 90;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    margin-bottom: 0;
-    padding: 0;
     box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 12px 10px 60px !important; /* 60px chừa hamburger */
+    margin-bottom: 0 !important;
   }
 
-  /* Hàng 1: hamburger + title + subtitle + nút Quản lý */
-  .topbar-left {
+  /* Ẩn topbar-left (title/sub) — gọn hơn trên mobile */
+  .topbar .topbar-left { display: none !important; }
+
+  /* Trên trang stats có topbar-left chứa title, giữ lại */
+  .stats-main .topbar .topbar-left,
+  .topbar.show-title .topbar-left {
+    display: flex !important;
+    flex: 1;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .topbar .topbar-title { font-size: 15px !important; font-weight: 800 !important; }
+  .topbar .topbar-sub   { display: none !important; }
+
+  .topbar .topbar-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex: 1 !important;
+    padding: 0 !important;
+  }
+
+  #searchInput {
+    flex: 1 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 9px 12px !important;
+    font-size: 14px !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  #adminBtn {
+    flex-shrink: 0 !important;
+    padding: 9px 12px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  .topbar .back-btn { padding: 8px 12px !important; font-size: 13px !important; }
+
+  /* ── Mobile header (hamburger + brand) ── */
+  .mobile-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px 6px 56px; /* 56px chừa chỗ hamburger fixed */
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 200;
+    height: 54px;
+    pointer-events: none;
   }
-  .topbar-left .topbar-title { font-size: 17px; font-weight: 800; flex: 1; }
-  .topbar-left .topbar-sub   { display: none; } /* ẩn bớt, chỉ giữ title */
-
-  /* Nút Quản lý nằm trong topbar-left hàng 1 */
-  .topbar-actions {
-    order: -1; /* về hàng 1 */
-    padding: 0 14px 8px;
-    display: flex;
-    gap: 8px;
-  }
-  #searchInput {
-    flex: 1;
-    min-width: 0;
-    width: auto;
-    max-width: none;
-    padding: 8px 12px;
-    font-size: 13.5px;
+  .hamburger {
+    position: static !important;
+    pointer-events: auto;
+    width: 44px; height: 44px;
+    margin: 5px 0 5px 8px;
     border-radius: var(--radius-sm);
-  }
-  #adminBtn {
     flex-shrink: 0;
-    padding: 8px 12px;
-    font-size: 13px;
+  }
+  .mobile-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    pointer-events: none;
     white-space: nowrap;
-    border-radius: var(--radius-sm);
+    margin-left: 6px;
   }
 
-  /* Subtitle hiện nhỏ bên cạnh title */
-  .topbar-title::after {
-    content: attr(data-sub);
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--text-3);
-    display: block;
-    margin-top: 1px;
-  }
+  /* ── Stats summary cards: 2 cột ── */
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
 
   /* ── Stats shelf chart ── */
   .shelf-label { width: 100px; font-size: 12px; }
@@ -99,9 +131,6 @@
   .filter-select,
   .admin-toolbar .btn-primary { width: 100%; }
   .admin-toolbar .btn-primary { justify-content: center; }
-
-  /* ── Stats summary cards: 2 cột ── */
-  .stat-cards { grid-template-columns: repeat(2, 1fr); }
 
   /* ── Login: ẩn panel trái ── */
   .login-wrap        { grid-template-columns: 1fr; }
@@ -151,4 +180,9 @@
   .modal-footer { gap: 8px; }
   .modal-footer .btn-primary,
   .modal-footer .btn-cancel { flex: 1; justify-content: center; }
+}
+
+/* ── Desktop: mobile-header ẩn ── */
+@media (min-width: 769px) {
+  .mobile-header { display: none; }
 }
