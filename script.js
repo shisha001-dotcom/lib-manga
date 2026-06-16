@@ -1,34 +1,30 @@
 /* ===================================================
    script.js — Kho Sách
    Render thư viện, filter, search
+
+   Phụ thuộc: js/supabase.js (sbGet), js/ui.js (esc)
    =================================================== */
 
-const _LIB_URL  = "https://dklfwlgpomnrmxmbjpat.supabase.co";
-const _LIB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrbGZ3bGdwb21ucm14bWJqcGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDQ5MDAsImV4cCI6MjA5NDA4MDkwMH0.sy8zDIdh9RBhl9TOqg6PnfTehqtV7VcFQSaSPoc4MoI";
-const _LIB_H = { apikey: _LIB_ANON, Authorization: `Bearer ${_LIB_ANON}` };
-
-let allBooksData   = [];  // raw from Supabase
-let currentFilter  = "all";
-let currentSearch  = "";
+let allBooksData  = [];
+let currentFilter = 'all';
+let currentSearch = '';
 
 /* ===== Bootstrap ===== */
 (async function init() {
   try {
     const [rawBooks, rawVols] = await Promise.all([
-      sbFetch("books", "select=*&order=title.asc"),
-      sbFetch("volumes", "select=*&order=number.asc"),
+      sbGet('books',   'select=*&order=title.asc'),
+      sbGet('volumes', 'select=*&order=number.asc'),
     ]);
 
-    // Group volumes by book_id
     const volMap = {};
     rawVols.forEach(v => {
       if (!volMap[v.book_id]) volMap[v.book_id] = [];
       volMap[v.book_id].push(v);
     });
 
-    // Attach volumes to each book
     allBooksData = rawBooks.map(b => {
-      const vols  = (volMap[b.id] || []).sort((a, b) => a.number - b.number);
+      const vols  = (volMap[b.id] || []).sort((a, c) => a.number - c.number);
       const owned = vols.filter(v => v.owned).length;
       return { ...b, volumes: vols, owned, total: vols.length };
     });
@@ -37,35 +33,26 @@ let currentSearch  = "";
     updateTopbarSub();
 
   } catch (err) {
-    console.error("Lỗi tải dữ liệu:", err);
-    ["readingShelf","nextShelf","finishedShelf"].forEach(id => {
+    console.error('Lỗi tải dữ liệu:', err);
+    ['readingShelf', 'nextShelf', 'finishedShelf'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = `<p class="empty-msg">⚠️ Không tải được dữ liệu. Vui lòng thử lại.</p>`;
     });
   }
 })();
 
-async function sbFetch(table, params = "") {
-  const r = await fetch(`${_LIB_URL}/rest/v1/${table}?${params}`, { headers: _LIB_H });
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-
 /* ===== Search ===== */
-const searchEl = document.getElementById("searchInput");
-if (searchEl) {
-  searchEl.addEventListener("input", () => {
-    currentSearch = searchEl.value.trim().toLowerCase();
-    renderAll();
-  });
-}
+document.getElementById('searchInput')?.addEventListener('input', function () {
+  currentSearch = this.value.trim().toLowerCase();
+  renderAll();
+});
 
 /* ===== Nav filter buttons ===== */
-document.querySelectorAll(".nav-btn[data-filter]").forEach(btn => {
-  btn.addEventListener("click", () => {
+document.querySelectorAll('.nav-btn[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
     currentFilter = btn.dataset.filter;
-    document.querySelectorAll(".nav-btn[data-filter]").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll('.nav-btn[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
     renderAll();
   });
 });
@@ -75,18 +62,18 @@ function renderAll() {
   const shelves = { reading: [], next: [], finished: [] };
 
   allBooksData.forEach(book => {
-    if (currentFilter === "complete"   && book.owned !== book.total) return;
-    if (currentFilter === "incomplete" && book.owned === book.total) return;
+    if (currentFilter === 'complete'   && book.owned !== book.total) return;
+    if (currentFilter === 'incomplete' && book.owned === book.total) return;
     if (currentSearch) {
-      const haystack = (book.title + " " + book.author).toLowerCase();
+      const haystack = (book.title + ' ' + book.author).toLowerCase();
       if (!haystack.includes(currentSearch)) return;
     }
     if (shelves[book.shelf] !== undefined) shelves[book.shelf].push(book);
   });
 
-  renderShelf("readingShelf",  "countReading",  shelves.reading);
-  renderShelf("nextShelf",     "countNext",     shelves.next);
-  renderShelf("finishedShelf", "countFinished", shelves.finished);
+  renderShelf('readingShelf',  'countReading',  shelves.reading);
+  renderShelf('nextShelf',     'countNext',     shelves.next);
+  renderShelf('finishedShelf', 'countFinished', shelves.finished);
 }
 
 function renderShelf(gridId, countId, books) {
@@ -96,22 +83,22 @@ function renderShelf(gridId, countId, books) {
 
   if (counter) counter.textContent = books.length;
 
-  if (books.length === 0) {
+  if (!books.length) {
     grid.innerHTML = `<p class="empty-msg">Không có bộ nào.</p>`;
     return;
   }
 
   grid.innerHTML = books.map(book => {
-    const pct         = book.total > 0 ? Math.round((book.owned / book.total) * 100) : 0;
-    const isComplete  = book.owned === book.total && book.total > 0;
-    const coverSrc    = book.cover_override
+    const pct        = book.total > 0 ? Math.round((book.owned / book.total) * 100) : 0;
+    const isComplete = book.owned === book.total && book.total > 0;
+    const coverSrc   = book.cover_override
       || (book.volumes.length > 0 && book.volumes[0].cover)
-      || "";
+      || '';
 
     let badgeClass, badgeText;
-    if (isComplete)       { badgeClass = "badge-complete"; badgeText = `✅ Full ${book.total} tập`; }
-    else if (pct >= 50)   { badgeClass = "badge-mid";      badgeText = `${pct}%`; }
-    else                  { badgeClass = "badge-low";       badgeText = `${book.owned}/${book.total}`; }
+    if (isComplete)     { badgeClass = 'badge-complete'; badgeText = `✅ Full ${book.total} tập`; }
+    else if (pct >= 50) { badgeClass = 'badge-mid';      badgeText = `${pct}%`; }
+    else                { badgeClass = 'badge-low';       badgeText = `${book.owned}/${book.total}`; }
 
     const coverStyle = coverSrc
       ? `background-image:url('${esc(coverSrc)}')`
@@ -120,7 +107,7 @@ function renderShelf(gridId, countId, books) {
     return `
       <div class="book-card" onclick="openBook('${esc(book.id)}')">
         <div class="book-cover" style="${coverStyle}">
-          ${coverSrc ? "" : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.3">📖</div>`}
+          ${coverSrc ? '' : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.3">📖</div>`}
           <div class="volume-badge ${badgeClass}">${badgeText}</div>
         </div>
         <div class="book-info">
@@ -136,7 +123,7 @@ function renderShelf(gridId, countId, books) {
         </div>
       </div>
     `;
-  }).join("");
+  }).join('');
 }
 
 function openBook(id) {
@@ -144,16 +131,8 @@ function openBook(id) {
 }
 
 function updateTopbarSub() {
-  const totalOwned  = allBooksData.reduce((s, b) => s + b.owned, 0);
-  const totalVols   = allBooksData.reduce((s, b) => s + b.total, 0);
-  const sub = document.getElementById("topbarSub");
-  if (sub) {
-    sub.textContent = `${allBooksData.length} bộ · ${totalOwned}/${totalVols} tập đã sở hữu`;
-  }
-}
-
-function esc(s) {
-  return String(s || "")
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const totalOwned = allBooksData.reduce((s, b) => s + b.owned, 0);
+  const totalVols  = allBooksData.reduce((s, b) => s + b.total, 0);
+  const sub = document.getElementById('topbarSub');
+  if (sub) sub.textContent = `${allBooksData.length} bộ · ${totalOwned}/${totalVols} tập đã sở hữu`;
 }
