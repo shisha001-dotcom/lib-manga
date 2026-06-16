@@ -68,12 +68,102 @@
   .vl-url-input { font-size:13px;padding:7px 8px; }
   .vl-save-btn  { font-size:14px;padding:7px 10px; }
 }
+
+/* ── Mobile topbar: 1 hàng duy nhất ── */
+@media (max-width: 768px) {
+  /* Reset override từ responsive.css */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 90;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    /* 1 hàng ngang duy nhất */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 12px 10px 60px !important; /* 60px chừa hamburger bên trái */
+    margin-bottom: 0 !important;
+  }
+
+  /* Ẩn title/sub trên mobile — tiêu đề đã có trong hamburger menu */
+  .topbar .topbar-left { display: none !important; }
+
+  /* Actions chiếm full width còn lại */
+  .topbar .topbar-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex: 1 !important;
+    padding: 0 !important;
+  }
+
+  #searchInput {
+    flex: 1 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 9px 12px !important;
+    font-size: 14px !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  #adminBtn {
+    flex-shrink: 0 !important;
+    padding: 9px 12px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    border-radius: var(--radius-sm) !important;
+  }
+
+  /* Điều chỉnh padding main để không bị topbar che */
+  .main-content { padding-top: 64px !important; }
+
+  /* Mobile header bar (hamburger + brand) */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 200;
+    height: 54px;
+    pointer-events: none; /* cho qua click vào topbar bên dưới */
+  }
+  .hamburger {
+    position: static !important; /* override fixed từ responsive.css */
+    pointer-events: auto;
+    width: 44px; height: 44px;
+    margin: 5px 0 5px 8px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+  }
+  .mobile-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    pointer-events: none;
+    white-space: nowrap;
+    margin-left: 6px;
+  }
+}
+@media (min-width: 769px) {
+  .mobile-header { display: none; }
+}
   </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+<!-- Mobile header: hamburger + brand name -->
+<div class="mobile-header" id="mobileHeader">
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+  <span class="mobile-brand">📚 Kho Sách</span>
+</div>
 
 <div class="app">
 
@@ -112,12 +202,14 @@
 
   <main class="main-content">
     <div class="topbar">
+      <!-- Title + sub (desktop: trái, mobile: ẩn sub) -->
       <div class="topbar-left">
         <div class="topbar-title">Thư viện</div>
         <div class="topbar-sub" id="topbarSub">Đang tải...</div>
       </div>
+      <!-- Actions: search + admin btn -->
       <div class="topbar-actions">
-        <input type="text" id="searchInput" placeholder="🔍 Tìm tên, tác giả...">
+        <input type="text" id="searchInput" placeholder="🔍 Tìm...">
         <button id="adminBtn" class="btn-primary" onclick="openAdminPanel()" style="display:none;">⚙️ Quản lý</button>
       </div>
     </div>
