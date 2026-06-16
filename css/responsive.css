@@ -21,18 +21,73 @@
   }
   .sidebar.open { transform: translateX(0); }
 
-  /* ── Page padding (account for hamburger) ── */
-  .main-content { padding: 20px 16px 40px; padding-top: 72px; }
-  .detail-page  { padding: 72px 16px 48px; }
-  .stats-main   { padding: 20px 16px 48px; padding-top: 72px; }
+  /* ── Page padding — chừa chỗ cho sticky topbar ── */
+  .main-content { padding: 112px 14px 40px; }
+  .stats-main   { padding: 112px 14px 48px; }
+  .detail-page  { padding: 64px 14px 48px; }
 
   /* ── Book grids ── */
   .book-grid   { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
   .detail-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
 
-  /* ── Topbar ── */
-  .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
-  #searchInput { width: 100%; max-width: none; }
+  /* ── Sticky topbar wrapper ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 90;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+  }
+
+  /* Hàng 1: hamburger + title + subtitle + nút Quản lý */
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 6px 56px; /* 56px chừa chỗ hamburger fixed */
+  }
+  .topbar-left .topbar-title { font-size: 17px; font-weight: 800; flex: 1; }
+  .topbar-left .topbar-sub   { display: none; } /* ẩn bớt, chỉ giữ title */
+
+  /* Nút Quản lý nằm trong topbar-left hàng 1 */
+  .topbar-actions {
+    order: -1; /* về hàng 1 */
+    padding: 0 14px 8px;
+    display: flex;
+    gap: 8px;
+  }
+  #searchInput {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    max-width: none;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    border-radius: var(--radius-sm);
+  }
+  #adminBtn {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Subtitle hiện nhỏ bên cạnh title */
+  .topbar-title::after {
+    content: attr(data-sub);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-3);
+    display: block;
+    margin-top: 1px;
+  }
 
   /* ── Stats shelf chart ── */
   .shelf-label { width: 100px; font-size: 12px; }
@@ -43,30 +98,21 @@
   .search-box,
   .filter-select,
   .admin-toolbar .btn-primary { width: 100%; }
+  .admin-toolbar .btn-primary { justify-content: center; }
 
   /* ── Stats summary cards: 2 cột ── */
   .stat-cards { grid-template-columns: repeat(2, 1fr); }
 
-  /* ── Login: ẩn panel trái, chỉ hiện form ── */
+  /* ── Login: ẩn panel trái ── */
   .login-wrap        { grid-template-columns: 1fr; }
   .login-aside       { display: none; }
   .login-form-area   { padding: 36px 28px; }
-}
 
-/* ===================================================
-   THÊM VÀO CUỐI css/responsive.css
-   (bên trong block @media (max-width: 768px) đã có)
-   =================================================== */
-
-@media (max-width: 768px) {
-
-  /* ── Volume modal ── */
+  /* ── Vol modal: stack controls dọc ── */
   .vol-modal { padding: 20px 16px 16px; }
-
   .vol-book-title { font-size: 16px; }
   .vol-book-meta  { font-size: 12px; margin-bottom: 14px; }
 
-  /* Stack controls thành cột dọc thay vì hàng ngang */
   .vol-controls {
     flex-direction: column;
     align-items: stretch;
@@ -85,33 +131,24 @@
     justify-content: center;
   }
 
-  /* Vol grid: tap target lớn hơn */
+  /* ── Vol grid: tap targets lớn hơn ── */
   .vol-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
     gap: 10px;
   }
-  .vol-item { padding: 8px 6px; }
+  .vol-item      { padding: 8px 6px; }
   .vol-cover-mini { width: 52px; height: 72px; }
-  .vol-num { font-size: 12px; }
+  .vol-num       { font-size: 12px; }
 
-  /* Nút xóa luôn hiện trên mobile (không cần hover) */
-  .vol-del-btn { display: flex; }
+  /* Luôn hiện cả 2 nút trên mobile */
+  .vol-del-btn,
+  .vol-edit-btn  { display: flex !important; }
 
-  /* ── Book edit modal ── */
+  /* ── Modal form: 1 cột ── */
   .form-grid { grid-template-columns: 1fr; }
   .form-full  { grid-column: unset; }
   .modal      { padding: 20px 16px; }
   .modal-footer { gap: 8px; }
   .modal-footer .btn-primary,
   .modal-footer .btn-cancel { flex: 1; justify-content: center; }
-
-  /* ── Admin toolbar ── */
-  .admin-toolbar .btn-primary { justify-content: center; }
-
-  /* ── Detail page: nút thêm tập ── */
-  .detail-add-btn {
-    width: 100%;
-    justify-content: center;
-    margin-top: 10px;
-  }
 }
