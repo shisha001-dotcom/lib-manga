@@ -64,12 +64,71 @@
   .vl-url-input { font-size:13px;padding:7px 8px; }
   .vl-save-btn  { font-size:14px;padding:7px 10px; }
 }
+
+/* ── Mobile topbar: 1 hàng ── */
+@media (max-width: 768px) {
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0; z-index: 90;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 12px 10px 60px !important;
+    margin-bottom: 0 !important;
+  }
+  .topbar .topbar-left {
+    flex: 1;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1px !important;
+    min-width: 0;
+  }
+  .topbar .topbar-title { font-size: 15px !important; font-weight: 800 !important; }
+  .topbar .topbar-sub   { display: none !important; }
+  .topbar .topbar-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+  }
+  .topbar .back-btn { padding: 8px 12px !important; font-size: 13px !important; }
+  #adminBtn { padding: 9px 12px !important; font-size: 13px !important; white-space: nowrap !important; }
+  .stats-main { padding-top: 64px !important; }
+
+  .mobile-header {
+    display: flex; align-items: center;
+    position: fixed; top: 0; left: 0; z-index: 200;
+    height: 54px; pointer-events: none;
+  }
+  .hamburger {
+    position: static !important;
+    pointer-events: auto;
+    width: 44px; height: 44px;
+    margin: 5px 0 5px 8px;
+    border-radius: var(--radius-sm);
+  }
+  .mobile-brand {
+    font-size: 14px; font-weight: 700;
+    color: var(--text); letter-spacing: -0.01em;
+    pointer-events: none; white-space: nowrap; margin-left: 6px;
+  }
+}
+@media (min-width: 769px) { .mobile-header { display: none; } }
   </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="mobile-header" id="mobileHeader">
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+  <span class="mobile-brand">📚 Kho Sách</span>
+</div>
 
 <div class="app">
 
