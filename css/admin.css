@@ -132,7 +132,7 @@
   margin-top: 5px;
 }
 
-/* ── Admin toolbar (search + filter + add) ── */
+/* ── Admin toolbar ── */
 .admin-toolbar {
   display: flex;
   gap: 10px;
@@ -178,7 +178,6 @@
 }
 
 table { width: 100%; border-collapse: collapse; }
-
 thead { background: var(--bg-alt); }
 
 th {
@@ -222,7 +221,6 @@ tr:hover td { background: var(--bg-alt); }
   border: 1px solid var(--border);
 }
 
-/* Shelf badges in table */
 .shelf-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -237,7 +235,6 @@ tr:hover td { background: var(--bg-alt); }
 .vol-count  { font-size: 13px; color: var(--text-3); }
 .vol-owned  { color: var(--accent); font-weight: 700; }
 
-/* Row action buttons */
 .row-actions { display: flex; gap: 5px; }
 
 .btn-icon {
@@ -341,12 +338,18 @@ tr:hover td { background: var(--bg-alt); }
   background: var(--bg);
   transition: all 0.15s;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .vol-item.owned {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 7%, transparent);
 }
 .vol-item:hover { border-color: var(--accent); }
+.vol-item.pressing {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
 
 .vol-cover-mini {
   width: 48px;
@@ -356,7 +359,7 @@ tr:hover td { background: var(--bg-alt); }
   border: 1px solid var(--border);
 }
 
-.vol-num      { font-size: 11.5px; font-weight: 700; color: var(--text); }
+.vol-num       { font-size: 11.5px; font-weight: 700; color: var(--text); }
 .vol-owned-dot {
   position: absolute;
   top: 4px; right: 4px;
@@ -365,6 +368,7 @@ tr:hover td { background: var(--bg-alt); }
   background: var(--accent);
 }
 
+/* ── Nút xóa tập ── */
 .vol-del-btn {
   position: absolute;
   top: 2px; left: 2px;
@@ -380,3 +384,86 @@ tr:hover td { background: var(--bg-alt); }
   justify-content: center;
 }
 .vol-item:hover .vol-del-btn { display: flex; }
+
+/* ── Nút sửa bìa ── */
+.vol-edit-btn {
+  position: absolute;
+  bottom: 24px; right: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  font-size: 9px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.vol-item:hover .vol-edit-btn { display: flex; }
+
+/* ── Cover edit popover ── */
+.cover-popover-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 600;
+  backdrop-filter: blur(2px);
+}
+.cover-popover-backdrop.open { display: block; }
+
+.cover-popover {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -40%) scale(0.96);
+  width: min(420px, calc(100vw - 32px));
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: 22px 20px 20px;
+  z-index: 700;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.22s cubic-bezier(.34,1.3,.64,1);
+}
+.cover-popover.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.cover-popover-title {
+  font-size: 15px; font-weight: 800;
+  color: var(--text); letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.cover-popover-preview-wrap {
+  width: 100%; display: flex; justify-content: center;
+  margin-bottom: 14px; min-height: 80px;
+}
+.cover-popover-preview {
+  max-height: 160px; max-width: 120px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  display: none;
+}
+.cover-popover-preview.visible { display: block; }
+.cover-popover-label {
+  display: block; font-size: 12px; font-weight: 700;
+  color: var(--text-2); margin-bottom: 6px;
+}
+.cover-popover-input {
+  width: 100%; padding: 11px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px; background: var(--bg); color: var(--text);
+  outline: none; font-family: inherit;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+.cover-popover-input:focus { border-color: var(--accent); }
+.cover-popover-actions { display: flex; gap: 8px; }
+.cover-popover-actions .btn-primary,
+.cover-popover-actions .btn-cancel { flex: 1; justify-content: center; }
