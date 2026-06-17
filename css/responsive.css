@@ -4,7 +4,10 @@
    =================================================== */
 
 @media (max-width: 768px) {
-
+  /* Sheet add row: stack dọc trên mobile */
+  .sheet-add-row { flex-direction: column; }
+  .sheet-field input { width: 100%; }
+   
   /* ── App shell ── */
   .app { grid-template-columns: 1fr; }
 
