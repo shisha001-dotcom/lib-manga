@@ -346,12 +346,13 @@
   margin-bottom: 10px;
 }
 
-/* ── Add row ── */
+/* ── Add row: luôn 2 cột ngang ── */
 .sheet-add-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 96px 1fr;
   gap: 10px;
   margin-bottom: 10px;
-  align-items: flex-end;
+  align-items: end;
 }
 
 .sheet-field {
@@ -363,26 +364,22 @@
   font-size: 11.5px;
   font-weight: 600;
   color: var(--text-2);
+  white-space: nowrap;
 }
 .sheet-field input {
-  padding: 9px 12px;
+  width: 100%;
+  padding: 10px 12px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 15px;
   background: var(--bg);
   color: var(--text);
   outline: none;
   font-family: inherit;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 .sheet-field input:focus { border-color: var(--accent); }
-
-/* Số tập: cố định nhỏ */
-.sheet-field:first-child input { width: 88px; }
-
-/* URL bìa: co dãn */
-.sheet-field-cover { flex: 1; }
-.sheet-field-cover input { width: 100%; }
 
 .sheet-add-btn {
   width: 100%;
